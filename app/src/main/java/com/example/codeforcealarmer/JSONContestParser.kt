@@ -11,9 +11,11 @@ class JSONContestParser(val input: String) {
         OK, FAILED
     }
 
-    private val status : STATUS
+    var status : STATUS
+        private set
     private var comment : String? = null
-    private var contests : ArrayList<Contest>? = null
+    var contests : ArrayList<Contest>? = null
+        private set
 
     init {
         try {
@@ -31,9 +33,16 @@ class JSONContestParser(val input: String) {
                 var result = rootJSON.getJSONArray("result")
                 for (i in 0 until result.length()){
                     val entry = result.getJSONObject(i)
+                    val id = entry.getInt("id")
                     val name = entry.getString("name")
-
-                    contests?.add(Contest(name))
+                    val type = SCORE_SYSTEM.fromStr(entry.getString("type"))
+                    val phase = PHASE.fromStr(entry.getString("phase"))
+                    val durationSecs = entry.getInt("durationSeconds")
+                    val startTimeSecs = getIntOrNull("startTimeSeconds", entry)
+                    val relativeTimeSecs = getIntOrNull("relativeTimeSeconds", entry)
+                    val websiteUrl = getStringOrNull("websiteUrl", entry)
+                    contests?.add(Contest(id, name, type, phase, durationSecs,
+                        startTimeSecs, relativeTimeSecs, websiteUrl))
                 }
             }
         }catch (e : JSONException){
@@ -41,4 +50,18 @@ class JSONContestParser(val input: String) {
             throw IllegalArgumentException()
         }
     }
+
+    fun getIntOrNull(name: String, jsonObject: JSONObject) =
+        try{
+            jsonObject.getInt(name)
+        }catch (e : JSONException){
+            null
+        }
+
+    fun getStringOrNull(name: String, jsonObject: JSONObject) =
+        try{
+            jsonObject.getString(name)
+        }catch (e : JSONException){
+            null
+        }
 }
