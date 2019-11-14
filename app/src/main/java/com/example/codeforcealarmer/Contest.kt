@@ -31,5 +31,5 @@ enum class PHASE{
 
 
 data class Contest(val id: Int, val name: String, val type: SCORE_SYSTEM, val phase: PHASE,
-    val durationSeconds: Int, val startTimeSeconds: Int?, val relativeTimeSeconds: Int?,
+    val durationSeconds: Long, val startTimeSeconds: Long?, val relativeTimeSeconds: Long?,
                    val websiteUrl: String?)

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.threetenabp.AndroidThreeTen
+import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 
 class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayList<Contest>> {
@@ -36,9 +37,9 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayLis
 
         val startTime: Long = 1576328700
         val ins = Instant.ofEpochSecond(startTime)
-        val cal = java.util.Calendar.getInstance()
-        cal.timeInMillis = startTime.toLong()
-        Toast.makeText(this, ins.toString(), Toast.LENGTH_LONG).show()
+        val duration = Duration.ofSeconds(7200)
+
+        Toast.makeText(this, duration.toString(), Toast.LENGTH_LONG).show()
     }
 
     override fun onResume() {

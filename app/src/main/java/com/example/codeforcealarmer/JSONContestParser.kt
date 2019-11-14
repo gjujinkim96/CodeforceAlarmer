@@ -37,9 +37,9 @@ class JSONContestParser(val input: String) {
                     val name = entry.getString("name")
                     val type = SCORE_SYSTEM.fromStr(entry.getString("type"))
                     val phase = PHASE.fromStr(entry.getString("phase"))
-                    val durationSecs = entry.getInt("durationSeconds")
-                    val startTimeSecs = getIntOrNull("startTimeSeconds", entry)
-                    val relativeTimeSecs = getIntOrNull("relativeTimeSeconds", entry)
+                    val durationSecs = entry.getLong("durationSeconds")
+                    val startTimeSecs = getLongOrNull("startTimeSeconds", entry)
+                    val relativeTimeSecs = getLongOrNull("relativeTimeSeconds", entry)
                     val websiteUrl = getStringOrNull("websiteUrl", entry)
                     contests?.add(Contest(id, name, type, phase, durationSecs,
                         startTimeSecs, relativeTimeSecs, websiteUrl))
@@ -51,9 +51,9 @@ class JSONContestParser(val input: String) {
         }
     }
 
-    fun getIntOrNull(name: String, jsonObject: JSONObject) =
+    fun getLongOrNull(name: String, jsonObject: JSONObject) =
         try{
-            jsonObject.getInt(name)
+            jsonObject.getLong(name)
         }catch (e : JSONException){
             null
         }

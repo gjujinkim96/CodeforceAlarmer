@@ -1,21 +1,22 @@
 package com.example.codeforcealarmer
 
+import org.threeten.bp.Duration
+import org.threeten.bp.temporal.ChronoUnit
 import java.lang.StringBuilder
 import java.text.DecimalFormat
 
 class FormatHelper {
     companion object{
-        const val MIN_PER_SEC = 60
-        const val HOUR_PER_MIN = 60
-        const val DAY_PER_HOUR = 24
-        fun formatSeconds(seconds: Int) : String{
-            var min = seconds / MIN_PER_SEC
-            var hour = min / HOUR_PER_MIN
-            var day = hour / DAY_PER_HOUR
-            hour %= DAY_PER_HOUR
-            min %= HOUR_PER_MIN
+        fun formatSeconds(seconds: Long) : String{
+            var duration = Duration.ofSeconds(seconds)
+            val day = duration.toDays()
+            duration = duration.minusDays(day)
+            val hour = duration.toHours()
+            duration = duration.minusHours(hour)
+            val min = duration.toMinutes()
 
-            val ar : ArrayList<Int> = arrayListOf()
+
+            val ar : ArrayList<Long> = arrayListOf()
             if (day > 0)
                 ar.add(day)
             ar.apply {
