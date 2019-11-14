@@ -1,16 +1,30 @@
 package com.example.codeforcealarmer
 
+import java.lang.StringBuilder
 import java.text.DecimalFormat
 
 class FormatHelper {
     companion object{
-        const val SECONDS_PER_HOUR = 3600
-        const val SECONDS_PER_MIN = 60
+        const val MIN_PER_SEC = 60
+        const val HOUR_PER_MIN = 60
+        const val DAY_PER_HOUR = 24
         fun formatSeconds(seconds: Int) : String{
-            val hour = seconds / SECONDS_PER_HOUR
-            val min = (seconds % SECONDS_PER_HOUR) / SECONDS_PER_MIN
+            var min = seconds / MIN_PER_SEC
+            var hour = min / HOUR_PER_MIN
+            var day = hour / DAY_PER_HOUR
+            hour %= DAY_PER_HOUR
+            min %= HOUR_PER_MIN
+
+            val ar : ArrayList<Int> = arrayListOf()
+            if (day > 0)
+                ar.add(day)
+            ar.apply {
+                add(hour)
+                add(min)
+            }
+
             val decimalFormat = DecimalFormat("00")
-            return "${decimalFormat.format(hour)}:${decimalFormat.format(min)}"
+            return ar.joinToString(":", transform = { decimalFormat.format(it) })
         }
     }
 }

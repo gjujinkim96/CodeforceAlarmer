@@ -9,6 +9,8 @@ import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.jakewharton.threetenabp.AndroidThreeTen
+import org.threeten.bp.Instant
 
 class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayList<Contest>> {
     val CONTEST_LOADER = 1
@@ -18,6 +20,7 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayLis
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AndroidThreeTen.init(this)
         setContentView(R.layout.activity_main)
 
         val data = arrayListOf<Contest>()
@@ -31,10 +34,11 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayLis
             addItemDecoration(DividerItemDecoration(this@MainActivity, DividerItemDecoration.VERTICAL))
         }
 
-        val startTime = 1576328700
+        val startTime: Long = 1576328700
+        val ins = Instant.ofEpochSecond(startTime)
         val cal = java.util.Calendar.getInstance()
         cal.timeInMillis = startTime.toLong()
-        Toast.makeText(this, cal.time.toString(), Toast.LENGTH_LONG).show()
+        Toast.makeText(this, ins.toString(), Toast.LENGTH_LONG).show()
     }
 
     override fun onResume() {
