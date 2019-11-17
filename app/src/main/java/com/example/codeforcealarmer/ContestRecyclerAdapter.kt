@@ -25,9 +25,10 @@ class ContestRecyclerAdapter(private val context: Context, var data: ArrayList<C
         val curContest = data?.get(position)
 
         if (curContest != null) {
-            holder.id.text = curContest?.id.toString()
-            holder.name.text = curContest?.name
+            holder.id.text = curContest.id.toString()
+            holder.name.text = curContest.name
             holder.length.text = FormatHelper.formatSeconds(curContest.durationSeconds)
+            holder.startTime.text = FormatHelper.formatTime(curContest.startTimeSeconds)
         }
     }
 
@@ -35,5 +36,6 @@ class ContestRecyclerAdapter(private val context: Context, var data: ArrayList<C
         val id : TextView = view.findViewById(R.id.id)
         val name : TextView = view.findViewById(R.id.name)
         val length : TextView = view.findViewById(R.id.length)
+        val startTime : TextView = view.findViewById(R.id.start_time)
     }
 }
