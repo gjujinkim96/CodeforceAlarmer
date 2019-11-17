@@ -1,17 +1,16 @@
 package com.example.codeforcealarmer
 
 import android.util.Log
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import kotlin.IllegalArgumentException
 
-class JSONContestParser(val input: String) {
-    enum class STATUS{
+class JsonContestParser(input: String) {
+    enum class Status{
         OK, FAILED
     }
 
-    var status : STATUS
+    var status : Status
         private set
     private var comment : String? = null
     var contests : ArrayList<Contest>? = null
@@ -19,30 +18,27 @@ class JSONContestParser(val input: String) {
 
     init {
         try {
-            val rootJSON = JSONObject(input)
-            status = when(rootJSON.getString("status")){
-                "OK" -> STATUS.OK
-                "FAILED" -> STATUS.FAILED
+            val rootJson = JSONObject(input)
+            status = when(rootJson.getString("status")){
+                "OK" -> Status.OK
+                "FAILED" -> Status.FAILED
                 else -> throw JSONException("Invalid status returned")
             }
 
-            if (status == STATUS.FAILED){
-                comment = rootJSON.getString("comment")
+            if (status == Status.FAILED){
+                comment = rootJson.getString("comment")
             }else{
                 contests = arrayListOf()
-                var result = rootJSON.getJSONArray("result")
+                var result = rootJson.getJSONArray("result")
                 for (i in 0 until result.length()){
                     val entry = result.getJSONObject(i)
                     val id = entry.getInt("id")
                     val name = entry.getString("name")
-                    val type = SCORE_SYSTEM.fromStr(entry.getString("type"))
-                    val phase = PHASE.fromStr(entry.getString("phase"))
+                    val phase = Phase.fromStr(entry.getString("phase"))
                     val durationSecs = entry.getLong("durationSeconds")
                     val startTimeSecs = getLongOrNull("startTimeSeconds", entry)
-                    val relativeTimeSecs = getLongOrNull("relativeTimeSeconds", entry)
-                    val websiteUrl = getStringOrNull("websiteUrl", entry)
-                    contests?.add(Contest(id, name, type, phase, durationSecs,
-                        startTimeSecs, relativeTimeSecs, websiteUrl))
+
+                    contests?.add(Contest(id, name, phase, durationSecs, startTimeSecs))
                 }
             }
         }catch (e : JSONException){
@@ -50,6 +46,13 @@ class JSONContestParser(val input: String) {
             throw IllegalArgumentException()
         }
     }
+
+    fun getIntOrNull(name: String, jsonObject: JSONObject) =
+        try{
+            jsonObject.getInt(name)
+        }catch (e : JSONException){
+            null
+        }
 
     fun getLongOrNull(name: String, jsonObject: JSONObject) =
         try{

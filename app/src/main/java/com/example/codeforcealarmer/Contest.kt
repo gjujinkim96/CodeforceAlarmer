@@ -1,20 +1,6 @@
 package com.example.codeforcealarmer
 
-enum class SCORE_SYSTEM{
-    CF, IOI, ICPC;
-    companion object {
-        fun fromStr(str: String) =
-            when (str){
-                "CF" -> CF
-                "IOI" -> IOI
-                "ICPC" -> ICPC
-                else -> throw IllegalArgumentException()
-            }
-    }
-}
-
-
-enum class PHASE{
+enum class Phase{
     BEFORE, CODING, PENDING_SYSTEM_TEST, SYSTEM_TEST, FINISHED;
     companion object {
         fun fromStr(str: String) =
@@ -30,6 +16,4 @@ enum class PHASE{
 }
 
 
-data class Contest(val id: Int, val name: String, val type: SCORE_SYSTEM, val phase: PHASE,
-    val durationSeconds: Long, val startTimeSeconds: Long?, val relativeTimeSeconds: Long?,
-                   val websiteUrl: String?)
+data class Contest(val id: Int, val name: String, val phase: Phase, val durationSeconds: Long, val startTimeSeconds: Long?)

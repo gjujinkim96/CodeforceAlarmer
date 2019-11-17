@@ -10,10 +10,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.*
 
 class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayList<Contest>> {
-    val CONTEST_LOADER = 1
+    companion object {
+        const val CONTEST_LOADER = 1
+    }
 
     lateinit var recyclerAdapter: ContestRecyclerAdapter
     lateinit var recyclerView: RecyclerView
@@ -22,7 +25,6 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayLis
         super.onCreate(savedInstanceState)
         AndroidThreeTen.init(this)
         setContentView(R.layout.activity_main)
-
         val data = arrayListOf<Contest>()
         recyclerAdapter = ContestRecyclerAdapter(this, data)
 
@@ -33,12 +35,6 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayLis
             layoutManager = LinearLayoutManager(this@MainActivity)
             addItemDecoration(DividerItemDecoration(this@MainActivity, DividerItemDecoration.VERTICAL))
         }
-
-        val startTime: Long = 1576328700
-        val ins = Instant.ofEpochSecond(startTime)
-        val zoneId = ZoneId.systemDefault()
-        val zonedDateTime = ZonedDateTime.ofInstant(ins, zoneId)
-        Toast.makeText(this, zonedDateTime.toString(), Toast.LENGTH_LONG).show()
     }
 
     override fun onResume() {

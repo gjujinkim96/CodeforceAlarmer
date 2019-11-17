@@ -24,8 +24,8 @@ class ContestLoader(context: Context, val url : String) : AsyncTaskLoader<ArrayL
             Log.e(this::class.java.simpleName, "failed to read jsonString")
             return null
         }else{
-            val jsonResult =  JSONContestParser(jsonString)
-            if (jsonResult.status == JSONContestParser.STATUS.OK) {
+            val jsonResult =  JsonContestParser(jsonString)
+            if (jsonResult.status == JsonContestParser.Status.OK) {
                 return jsonResult.contests
             }else{
                 return null

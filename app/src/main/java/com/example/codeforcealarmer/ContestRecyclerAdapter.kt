@@ -6,6 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.contest_recycler_item.*
+import kotlinx.android.synthetic.main.contest_recycler_item.view.*
 
 class ContestRecyclerAdapter(private val context: Context, var data: ArrayList<Contest>?)
     : RecyclerView.Adapter<ContestRecyclerAdapter.ContestViewHolder>() {
@@ -22,20 +25,26 @@ class ContestRecyclerAdapter(private val context: Context, var data: ArrayList<C
     override fun getItemCount() = data?.size ?: 0
 
     override fun onBindViewHolder(holder: ContestViewHolder, position: Int) {
-        val curContest = data?.get(position)
-
-        if (curContest != null) {
-            holder.id.text = curContest.id.toString()
-            holder.name.text = curContest.name
-            holder.length.text = FormatHelper.formatSeconds(curContest.durationSeconds)
-            holder.startTime.text = FormatHelper.formatTime(curContest.startTimeSeconds)
-        }
+        holder.bind(data?.get(position))
     }
 
-    class ContestViewHolder(view : View) : RecyclerView.ViewHolder(view){
-        val id : TextView = view.findViewById(R.id.id)
-        val name : TextView = view.findViewById(R.id.name)
-        val length : TextView = view.findViewById(R.id.length)
-        val startTime : TextView = view.findViewById(R.id.start_time)
+    class ContestViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView), LayoutContainer{
+        override val containerView: View?
+            get() = itemView
+
+
+        fun bind(contest: Contest?){
+            contest_id.text = "ID: " + contest?.id.toString()
+            name.text = "NAME: " + contest?.name
+            phase.text = "PHASE: " + contest?.phase.toString()
+            length.text = "DURATION: " + FormatHelper.formatSeconds(contest?.durationSeconds)
+            start_time.text = "START_TIME: " + FormatHelper.formatTime(contest?.startTimeSeconds)
+            web_url.text = if (contest == null) {
+                "URL: NONE"
+            }
+            else {
+                "URL: " + "https://codeforces.com/contests/${contest.id}"
+            }
+        }
     }
 }

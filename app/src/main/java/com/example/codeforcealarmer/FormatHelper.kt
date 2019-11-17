@@ -14,8 +14,19 @@ import kotlin.collections.ArrayList
 
 class FormatHelper {
     companion object{
-        fun formatSeconds(seconds: Long) : String{
-            var duration = Duration.ofSeconds(seconds)
+        fun formatSeconds(seconds: Long?) : String{
+            if (seconds == null)
+                return "Unknown"
+
+            var sec = seconds
+            var isNegative = false
+
+            if (sec < 0) {
+                sec *= -1
+                isNegative = true
+            }
+
+            var duration = Duration.ofSeconds(sec)
             val day = duration.toDays()
             duration = duration.minusDays(day)
             val hour = duration.toHours()
@@ -32,7 +43,7 @@ class FormatHelper {
             }
 
             val decimalFormat = DecimalFormat("00")
-            return ar.joinToString(":", transform = { decimalFormat.format(it) })
+            return "${ if (isNegative) "-" else ""}" +  ar.joinToString(":", transform = { decimalFormat.format(it) })
         }
 
         fun formatTime(seconds: Long?) : String{
