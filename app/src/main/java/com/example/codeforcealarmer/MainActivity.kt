@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayList<Contest>> {
     companion object {
@@ -26,14 +28,35 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayLis
         AndroidThreeTen.init(this)
         setContentView(R.layout.activity_main)
         val data = arrayListOf<Contest>()
-        recyclerAdapter = ContestRecyclerAdapter(this, data)
+        recyclerAdapter = ContestRecyclerAdapter(this, EnumSet.range(Phase.BEFORE, Phase.CODING),
+            ContestType(true, true),data)
 
-        recyclerView = findViewById(R.id.contest_recycler_view)
+        recyclerView = contest_recycler_view
 
         recyclerView.apply{
             adapter = recyclerAdapter
             layoutManager = LinearLayoutManager(this@MainActivity)
             addItemDecoration(DividerItemDecoration(this@MainActivity, DividerItemDecoration.VERTICAL))
+        }
+
+        main_div1.setOnCheckedChangeListener{
+                compoundButton, isChecked ->
+            recyclerAdapter.changeDivFilter(isChecked, ContestType.Type.DIV1)
+        }
+
+        main_div2.setOnCheckedChangeListener{
+                compoundButton, isChecked ->
+            recyclerAdapter.changeDivFilter(isChecked, ContestType.Type.DIV2)
+        }
+
+        main_div3.setOnCheckedChangeListener{
+                compoundButton, isChecked ->
+            recyclerAdapter.changeDivFilter(isChecked, ContestType.Type.DIV3)
+        }
+
+        main_other.setOnCheckedChangeListener{
+                compoundButton, isChecked ->
+            recyclerAdapter.changeDivFilter(isChecked, ContestType.Type.OTHER)
         }
     }
 

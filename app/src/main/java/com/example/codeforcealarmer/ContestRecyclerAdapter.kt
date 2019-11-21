@@ -4,16 +4,53 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.contest_recycler_item.*
-import kotlinx.android.synthetic.main.contest_recycler_item.view.*
+import java.util.*
+import kotlin.collections.ArrayList
 
-class ContestRecyclerAdapter(private val context: Context, var data: ArrayList<Contest>?)
+class ContestRecyclerAdapter(private val context: Context, private var phaseFilter: EnumSet<Phase>,
+                             private var divFilter: ContestType, private var data: ArrayList<Contest>?)
     : RecyclerView.Adapter<ContestRecyclerAdapter.ContestViewHolder>() {
+    private var phaseFilteredData: ArrayList<Contest>
+    private var showingData: ArrayList<Contest>
+    init {
+        phaseFilteredData = filterPhaseData(data)
+        showingData = filterDivData(phaseFilteredData)
+    }
+
+    private fun filterPhaseData(rawData: ArrayList<Contest>?) : ArrayList<Contest>{
+        val ret = arrayListOf<Contest>()
+        rawData?.forEach {
+            if (phaseFilter.contains(it.phase))
+                ret.add(it)
+        }
+
+        return ret
+    }
+
+    private fun filterDivData(rawData: ArrayList<Contest>?) : ArrayList<Contest>{
+        val ret = arrayListOf<Contest>()
+        rawData?.forEach {
+            if (divFilter.contains(it.contestType))
+                ret.add(it)
+        }
+
+        return ret
+    }
+
+    fun changeDivFilter(newValue: Boolean, toChange: ContestType.Type){
+        if (divFilter.setType(newValue, toChange)){
+            showingData = filterDivData(phaseFilteredData)
+            notifyDataSetChanged()
+        }
+    }
+
     fun updateData(newData : ArrayList<Contest>?){
         data = newData
+        phaseFilteredData = filterPhaseData(data)
+        showingData = filterDivData(phaseFilteredData)
         notifyDataSetChanged()
     }
 
@@ -22,12 +59,10 @@ class ContestRecyclerAdapter(private val context: Context, var data: ArrayList<C
         return ContestViewHolder(newView)
     }
 
-    override fun getItemCount() = data?.size ?: 0
+    override fun getItemCount() = showingData.size
 
     override fun onBindViewHolder(holder: ContestViewHolder, position: Int) {
-        val tmpData = data
-        if (tmpData != null)
-            holder.bind(tmpData[position])
+        holder.bind(showingData[position])
     }
 
     class ContestViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView), LayoutContainer{
@@ -37,15 +72,15 @@ class ContestRecyclerAdapter(private val context: Context, var data: ArrayList<C
 
         fun bind(contest: Contest){
             contest_id.text = "ID: " + contest.id.toString()
-            name.text = "NAME: " + contest.name
-            phase.text = "PHASE: " + contest.phase.toString()
-            length.text = "DURATION: " + FormatHelper.formatSeconds(contest.durationSeconds)
-            start_time.text = "START_TIME: " + FormatHelper.formatTime(contest.startTimeSeconds)
-            web_url.text = contest.getUrl()
-            div1.isChecked = contest.contestType.div1
-            div2.isChecked = contest.contestType.div2
-            div3.isChecked = contest.contestType.div3
-            other.isChecked = contest.contestType.other
+            contestname.text = "NAME: " + contest.name
+            contest_phase.text = "PHASE: " + contest.phase.toString()
+            contest_duration.text = "DURATION: " + FormatHelper.formatSeconds(contest.durationSeconds)
+            contest_start_time.text = "START_TIME: " + FormatHelper.formatTime(contest.startTimeSeconds)
+            contest_web_url.text = contest.getUrl()
+            main_div1.isChecked = contest.contestType.div1
+            contest_div2.isChecked = contest.contestType.div2
+            contest_div3.isChecked = contest.contestType.div3
+            contest_other.isChecked = contest.contestType.other
 
         }
     }

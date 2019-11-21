@@ -1,5 +1,7 @@
 package com.example.codeforcealarmer
 
+import java.util.*
+
 enum class Phase{
     BEFORE, CODING, PENDING_SYSTEM_TEST, SYSTEM_TEST, FINISHED;
     companion object {
@@ -15,45 +17,60 @@ enum class Phase{
     }
 }
 
-class ContestType(isDiv1: Boolean = false, isDiv2: Boolean = false, isDiv3: Boolean = false){
-    private val DIV1 = 1
-    private val DIV2 = 2
-    private val DIV3 = 4
 
-    private fun getBits(mask: Int) = (bits and mask) > 0
-
-    private fun setBits(value: Boolean, mask: Int) {
-        bits = if (value) {
-            bits or mask
-        } else {
-            bits and mask.inv()
-        }
+class ContestType(isDiv1: Boolean = false, isDiv2: Boolean = false, isDiv3: Boolean = false, isOther: Boolean = false){
+    enum class Type{
+        DIV1, DIV2, DIV3, OTHER
     }
 
-    private var bits: Int = 0
+    private var bits = EnumSet.noneOf(Type::class.java)
+    fun setType(value: Boolean, type: ContestType.Type) : Boolean{
+        val before = bits.contains(type)
+        if (value)
+            bits.add(type)
+        else
+            bits.remove(type)
+
+        return before != value
+    }
+
     var div1: Boolean
-        get() = getBits(DIV1)
-        set(value) = setBits(value, DIV1)
+        get() = bits.contains(Type.DIV1)
+        set(value){
+            setType(value, Type.DIV1)
+        }
 
     var div2: Boolean
-        get() = getBits(DIV2)
-        set(value) = setBits(value, DIV2)
+        get() = bits.contains(Type.DIV2)
+        set(value){
+            setType(value, Type.DIV2)
+        }
 
     var div3: Boolean
-        get() = getBits(DIV3)
-        set(value) = setBits(value, DIV3)
+        get() = bits.contains(Type.DIV3)
+        set(value){
+            setType(value, Type.DIV3)
+        }
 
-    val other: Boolean
-        get() = bits == 0
+    var other: Boolean
+        get() = bits.contains(Type.OTHER)
+        set(value){
+            setType(value, Type.OTHER)
+        }
 
     init {
         div1 = isDiv1
         div2 = isDiv2
         div3 = isDiv3
+        other = isOther
     }
 
+    fun isDiv() = div1 || div2 || div3
+
+    fun contains(other: ContestType) =  (div1 && other.div1) || (div2 && other.div2) || (div3 && other.div3) || (this.other && other.other)
+
     override fun toString() = "div1:$div1, div2:$div2, div3:$div3, other:$other"
-    override fun hashCode() = bits
+    override fun hashCode() = bits.hashCode()
     override fun equals(other: Any?) = if (other is ContestType){
         bits == other.bits
     }else{
@@ -72,6 +89,8 @@ data class Contest(val id: Int, val name: String, val contestType: ContestType, 
                 contestType.div2 = true
             if (name.contains("Div. 3", true))
                 contestType.div3 = true
+            if (!contestType.isDiv())
+                contestType.other = true
 
 
             return Contest(id, name, contestType, phase, durationSeconds, startTimeSeconds)

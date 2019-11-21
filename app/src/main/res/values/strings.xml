@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">CodeforceAlarmer</string>
+    <string name="app_name" translatable="false">CodeforceAlarmer</string>
+    <string name="main_other_checkbox">Other</string>
+    <string name="main_div_1_checkbox" translatable="false">Div. 1</string>
+    <string name="main_div_3_checkbox" translatable="false">Div. 3</string>
+    <string name="main_div_2_checkbox" translatable="false">Div. 2</string>
 </resources>

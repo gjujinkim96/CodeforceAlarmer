@@ -14,59 +14,59 @@
         tools:text="id" />
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/contestname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#000000"
         tools:text="name" />
 
     <TextView
-        android:id="@+id/phase"
+        android:id="@+id/contest_phase"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:text="phase" />
 
     <TextView
-        android:id="@+id/length"
+        android:id="@+id/contest_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="duration" />
 
     <TextView
-        android:id="@+id/start_time"
+        android:id="@+id/contest_start_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="start_time" />
 
     <TextView
-        android:id="@+id/web_url"
+        android:id="@+id/contest_web_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:text="url" />
 
     <CheckBox
-        android:id="@+id/div1"
+        android:id="@+id/main_div1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="false"
         android:text="div1" />
 
     <CheckBox
-        android:id="@+id/div2"
+        android:id="@+id/contest_div2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="false"
         android:text="div2" />
 
     <CheckBox
-        android:id="@+id/div3"
+        android:id="@+id/contest_div3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="false"
         android:text="div3" />
 
     <CheckBox
-        android:id="@+id/other"
+        android:id="@+id/contest_other"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="false"
