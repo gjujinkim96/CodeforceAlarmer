@@ -25,7 +25,9 @@ class ContestRecyclerAdapter(private val context: Context, var data: ArrayList<C
     override fun getItemCount() = data?.size ?: 0
 
     override fun onBindViewHolder(holder: ContestViewHolder, position: Int) {
-        holder.bind(data?.get(position))
+        val tmpData = data
+        if (tmpData != null)
+            holder.bind(tmpData[position])
     }
 
     class ContestViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView), LayoutContainer{
@@ -33,18 +35,18 @@ class ContestRecyclerAdapter(private val context: Context, var data: ArrayList<C
             get() = itemView
 
 
-        fun bind(contest: Contest?){
-            contest_id.text = "ID: " + contest?.id.toString()
-            name.text = "NAME: " + contest?.name
-            phase.text = "PHASE: " + contest?.phase.toString()
-            length.text = "DURATION: " + FormatHelper.formatSeconds(contest?.durationSeconds)
-            start_time.text = "START_TIME: " + FormatHelper.formatTime(contest?.startTimeSeconds)
-            web_url.text = if (contest == null) {
-                "URL: NONE"
-            }
-            else {
-                "URL: " + "https://codeforces.com/contests/${contest.id}"
-            }
+        fun bind(contest: Contest){
+            contest_id.text = "ID: " + contest.id.toString()
+            name.text = "NAME: " + contest.name
+            phase.text = "PHASE: " + contest.phase.toString()
+            length.text = "DURATION: " + FormatHelper.formatSeconds(contest.durationSeconds)
+            start_time.text = "START_TIME: " + FormatHelper.formatTime(contest.startTimeSeconds)
+            web_url.text = contest.getUrl()
+            div1.isChecked = contest.contestType.div1
+            div2.isChecked = contest.contestType.div2
+            div3.isChecked = contest.contestType.div3
+            other.isChecked = contest.contestType.other
+
         }
     }
 }

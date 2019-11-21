@@ -38,7 +38,7 @@ class JsonContestParser(input: String) {
                     val durationSecs = entry.getLong("durationSeconds")
                     val startTimeSecs = getLongOrNull("startTimeSeconds", entry)
 
-                    contests?.add(Contest(id, name, phase, durationSecs, startTimeSecs))
+                    contests?.add(Contest.makeContest(id, name, phase, durationSecs, startTimeSecs))
                 }
             }
         }catch (e : JSONException){

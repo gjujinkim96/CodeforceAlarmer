@@ -44,4 +44,32 @@
         android:layout_height="wrap_content"
         tools:text="url" />
 
+    <CheckBox
+        android:id="@+id/div1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:text="div1" />
+
+    <CheckBox
+        android:id="@+id/div2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:text="div2" />
+
+    <CheckBox
+        android:id="@+id/div3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:text="div3" />
+
+    <CheckBox
+        android:id="@+id/other"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:text="other" />
+
 </LinearLayout>

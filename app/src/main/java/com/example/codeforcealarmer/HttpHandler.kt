@@ -27,7 +27,8 @@ class HttpHandler {
 
             try
             {
-                httpConnection = urlObject.openConnection() as HttpURLConnection
+                httpConnection = urlObject.openConnection() as? HttpURLConnection ?: throw IOException()
+
                 httpConnection.apply {
                     connectTimeout = 5000
                     readTimeout = 5000
