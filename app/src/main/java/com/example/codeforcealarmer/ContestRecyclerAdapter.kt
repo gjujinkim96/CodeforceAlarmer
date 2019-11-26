@@ -7,50 +7,73 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.contest_recycler_item.*
+import org.threeten.bp.Instant
+import org.threeten.bp.LocalTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ContestRecyclerAdapter(private val context: Context, private var phaseFilter: EnumSet<Phase>,
-                             private var divFilter: ContestType, private var data: ArrayList<Contest>?)
+class ContestRecyclerAdapter(private val context: Context, private var divFilter: ContestType, private var startTime: LocalTime,
+                             private var endTime: LocalTime, private var data: ArrayList<Contest>?)
     : RecyclerView.Adapter<ContestRecyclerAdapter.ContestViewHolder>() {
-    private var phaseFilteredData: ArrayList<Contest>
-    private var showingData: ArrayList<Contest>
+    private var showingData: ArrayList<Contest> = arrayListOf()
     init {
-        phaseFilteredData = filterPhaseData(data)
-        showingData = filterDivData(phaseFilteredData)
+        makeShowingData()
     }
 
-    private fun filterPhaseData(rawData: ArrayList<Contest>?) : ArrayList<Contest>{
+    private fun filter(rawData: ArrayList<Contest>?) : ArrayList<Contest>{
         val ret = arrayListOf<Contest>()
-        rawData?.forEach {
-            if (phaseFilter.contains(it.phase))
-                ret.add(it)
+
+        if (rawData == null)
+            return ret
+
+        rawData.forEach{
+            if (it.startTimeSeconds != null){
+                val instant = Instant.ofEpochSecond(it.startTimeSeconds)
+                val zoneId = ZoneId.systemDefault()
+                val zonedDateTime = ZonedDateTime.ofInstant(instant, zoneId)
+                val localTime = zonedDateTime.toLocalTime()
+                if (divFilter.contains(it.contestType) &&
+                    (localTime.compareTo(startTime) >= 0 && localTime.compareTo(endTime) <= 0)){
+                    ret.add(it)
+                }
+            }
         }
 
         return ret
     }
 
-    private fun filterDivData(rawData: ArrayList<Contest>?) : ArrayList<Contest>{
-        val ret = arrayListOf<Contest>()
-        rawData?.forEach {
-            if (divFilter.contains(it.contestType))
-                ret.add(it)
-        }
-
-        return ret
+    private fun makeShowingData(){
+        showingData = filter(data)
     }
 
     fun changeDivFilter(newValue: Boolean, toChange: ContestType.Type){
         if (divFilter.setType(newValue, toChange)){
-            showingData = filterDivData(phaseFilteredData)
+            makeShowingData()
+            notifyDataSetChanged()
+        }
+    }
+
+    fun changeStartTime(newStartTime: LocalTime){
+        if (startTime != newStartTime){
+            startTime = newStartTime
+            makeShowingData()
+            notifyDataSetChanged()
+        }
+    }
+
+    fun changeEndTime(newEndTime: LocalTime){
+        if (endTime != newEndTime){
+            endTime = newEndTime
+            makeShowingData()
             notifyDataSetChanged()
         }
     }
 
     fun updateData(newData : ArrayList<Contest>?){
         data = newData
-        phaseFilteredData = filterPhaseData(data)
-        showingData = filterDivData(phaseFilteredData)
+        makeShowingData()
         notifyDataSetChanged()
     }
 
