@@ -14,15 +14,24 @@ import org.threeten.bp.ZonedDateTime
 import java.util.*
 import kotlin.collections.ArrayList
 
+enum class Sorting{
+    LATEST, OLDEST
+}
+
 class ContestRecyclerAdapter(private val context: Context, private var divFilter: ContestType, private var startTime: LocalTime,
-                             private var endTime: LocalTime, private var data: ArrayList<Contest>?)
+                             private var endTime: LocalTime, private var sortingBy: Sorting, private var data: MutableList<Contest>)
     : RecyclerView.Adapter<ContestRecyclerAdapter.ContestViewHolder>() {
-    private var showingData: ArrayList<Contest> = arrayListOf()
+    private var showingData: MutableList<Contest> = mutableListOf()
     init {
         makeShowingData()
     }
 
-    private fun filter(rawData: ArrayList<Contest>?) : ArrayList<Contest>{
+    fun getStartHour() = startTime.hour
+    fun getStartMin() = startTime.minute
+    fun getEndHour() = endTime.hour
+    fun getEndMin() = endTime.minute
+
+    private fun filter(rawData: MutableList<Contest>?) : MutableList<Contest>{
         val ret = arrayListOf<Contest>()
 
         if (rawData == null)
@@ -34,9 +43,12 @@ class ContestRecyclerAdapter(private val context: Context, private var divFilter
                 val zoneId = ZoneId.systemDefault()
                 val zonedDateTime = ZonedDateTime.ofInstant(instant, zoneId)
                 val localTime = zonedDateTime.toLocalTime()
-                if (divFilter.contains(it.contestType) &&
-                    (localTime.compareTo(startTime) >= 0 && localTime.compareTo(endTime) <= 0)){
-                    ret.add(it)
+                if (divFilter.contains(it.contestType)){
+                    if (startTime <= endTime){
+                        if (startTime <= localTime && localTime <= endTime)
+                            ret.add(it)
+                    } else if (startTime <= localTime || localTime <= endTime)
+                        ret.add(it)
                 }
             }
         }
@@ -46,6 +58,14 @@ class ContestRecyclerAdapter(private val context: Context, private var divFilter
 
     private fun makeShowingData(){
         showingData = filter(data)
+        when (sortingBy){
+            Sorting.LATEST->{
+                showingData.sortByDescending { it.startTimeSeconds }
+            }
+            Sorting.OLDEST->{
+                showingData.sortBy { it.startTimeSeconds }
+            }
+        }
     }
 
     fun changeDivFilter(newValue: Boolean, toChange: ContestType.Type){
@@ -71,7 +91,7 @@ class ContestRecyclerAdapter(private val context: Context, private var divFilter
         }
     }
 
-    fun updateData(newData : ArrayList<Contest>?){
+    fun updateData(newData : MutableList<Contest>){
         data = newData
         makeShowingData()
         notifyDataSetChanged()

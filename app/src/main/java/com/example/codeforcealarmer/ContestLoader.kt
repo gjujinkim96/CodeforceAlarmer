@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.Log
 import androidx.loader.content.AsyncTaskLoader
 
-class ContestLoader(context: Context, val url : String) : AsyncTaskLoader<ArrayList<Contest>>(context) {
-    var cache : ArrayList<Contest>? = null
+class ContestLoader(context: Context, val url : String) : AsyncTaskLoader<MutableList<Contest>>(context) {
+    var cache : MutableList<Contest>? = null
     override fun onStartLoading() {
         if (cache == null)
             forceLoad()
@@ -13,12 +13,12 @@ class ContestLoader(context: Context, val url : String) : AsyncTaskLoader<ArrayL
             deliverResult(cache)
     }
 
-    override fun deliverResult(data: ArrayList<Contest>?) {
+    override fun deliverResult(data: MutableList<Contest>?) {
         cache = data
         super.deliverResult(data)
     }
 
-    override fun loadInBackground(): ArrayList<Contest>? {
+    override fun loadInBackground(): MutableList<Contest>? {
         val jsonString = HttpHandler.fetchFromUrl(url)
         if (jsonString == null){
             Log.e(this::class.java.simpleName, "failed to read jsonString")
