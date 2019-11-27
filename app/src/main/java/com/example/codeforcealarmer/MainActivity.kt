@@ -19,7 +19,6 @@ import java.util.*
 class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<MutableList<Contest>>, TimePickerDialogFragment.ChangeTimeListener{
     companion object {
         const val CONTEST_LOADER = 1
-        const val SHAREDPREFERENCE_NAME = "com_codeforce_alarmer_shared_pref"
     }
 
     lateinit var recyclerAdapter: ContestRecyclerAdapter
@@ -73,37 +72,55 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<MutableL
 
         LoaderManager.getInstance(this).initLoader(CONTEST_LOADER, null, this)
 
-        val sharedPreferences = getSharedPreferences(SHAREDPREFERENCE_NAME, Context.MODE_PRIVATE)
-        val startHour = sharedPreferences.getInt("start_hour", 0)
-        val startMin = sharedPreferences.getInt("start_min", 0)
-        val endHour = sharedPreferences.getInt("end_hour", 23)
-        val endMin = sharedPreferences.getInt("end_min", 59)
+        val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_key), Context.MODE_PRIVATE)
+        val startHour = sharedPreferences.getInt(getString(R.string.saved_start_hour), 0)
+        val startMin = sharedPreferences.getInt(getString(R.string.saved_start_min), 0)
+        val endHour = sharedPreferences.getInt(getString(R.string.saved_end_hour), 23)
+        val endMin = sharedPreferences.getInt(getString(R.string.saved_end_min), 59)
         val startLocalTime = LocalTime.of(startHour, startMin)
         val endLocalTime = LocalTime.of(endHour, endMin)
 
         onChangedTime(1, startHour, startMin)
         onChangedTime(2, endHour, endMin)
 
+        val isDiv1Checked = sharedPreferences.getBoolean(getString(R.string.saved_is_div1), true)
+        val isDiv2Checked = sharedPreferences.getBoolean(getString(R.string.saved_is_div2), true)
+        val isDiv3Checked = sharedPreferences.getBoolean(getString(R.string.saved_is_div3), true)
+        val isOtherChecked = sharedPreferences.getBoolean(getString(R.string.saved_is_other), true)
+
+        main_div1.isChecked = isDiv1Checked
+        main_div2.isChecked = isDiv2Checked
+        main_div3.isChecked = isDiv3Checked
+        main_other.isChecked = isOtherChecked
+
         recyclerAdapter.apply{
             changeStartTime(startLocalTime)
             changeEndTime(endLocalTime)
+            changeDivFilter(isDiv1Checked, ContestType.Type.DIV1)
+            changeDivFilter(isDiv2Checked, ContestType.Type.DIV2)
+            changeDivFilter(isDiv3Checked, ContestType.Type.DIV3)
+            changeDivFilter(isOtherChecked, ContestType.Type.OTHER)
         }
     }
 
     override fun onPause() {
         super.onPause()
 
-        val sharedPreferences = getSharedPreferences(SHAREDPREFERENCE_NAME, Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_key), Context.MODE_PRIVATE)
         val startHour = recyclerAdapter.getStartHour()
         val startMin = recyclerAdapter.getStartMin()
         val endHour = recyclerAdapter.getEndHour()
         val endMin = recyclerAdapter.getEndMin()
 
         sharedPreferences.edit().apply{
-            putInt("start_hour", startHour)
-            putInt("start_min", startMin)
-            putInt("end_hour", endHour)
-            putInt("end_min", endMin)
+            putInt(getString(R.string.saved_start_hour), startHour)
+            putInt(getString(R.string.saved_start_min), startMin)
+            putInt(getString(R.string.saved_end_hour), endHour)
+            putInt(getString(R.string.saved_end_min), endMin)
+            putBoolean(getString(R.string.saved_is_div1), recyclerAdapter.isDiv1())
+            putBoolean(getString(R.string.saved_is_div2), recyclerAdapter.isDiv2())
+            putBoolean(getString(R.string.saved_is_div3), recyclerAdapter.isDiv3())
+            putBoolean(getString(R.string.saved_is_other), recyclerAdapter.isOther())
             apply()
         }
     }

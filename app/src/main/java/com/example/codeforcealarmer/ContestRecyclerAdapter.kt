@@ -31,6 +31,11 @@ class ContestRecyclerAdapter(private val context: Context, private var divFilter
     fun getEndHour() = endTime.hour
     fun getEndMin() = endTime.minute
 
+    fun isDiv1() = divFilter.div1
+    fun isDiv2() = divFilter.div2
+    fun isDiv3() = divFilter.div3
+    fun isOther() = divFilter.other
+
     private fun filter(rawData: MutableList<Contest>?) : MutableList<Contest>{
         val ret = arrayListOf<Contest>()
 
