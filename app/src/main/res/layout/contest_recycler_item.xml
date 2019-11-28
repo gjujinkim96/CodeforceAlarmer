@@ -1,75 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/recyclerview_item"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:id="@+id/contest_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="id" />
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/contestname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="name" />
 
     <TextView
         android:id="@+id/contest_phase"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contestname"
         tools:text="phase" />
 
     <TextView
         android:id="@+id/contest_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/contest_start_time"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:text="duration" />
 
     <TextView
         android:id="@+id/contest_start_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contest_phase"
         tools:text="start_time" />
 
-    <TextView
-        android:id="@+id/contest_web_url"
-        android:layout_width="match_parent"
+    <Space
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="url" />
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contest_duration" />
 
-    <CheckBox
-        android:id="@+id/main_div1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="false"
-        android:text="div1" />
-
-    <CheckBox
-        android:id="@+id/contest_div2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="false"
-        android:text="div2" />
-
-    <CheckBox
-        android:id="@+id/contest_div3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="false"
-        android:text="div3" />
-
-    <CheckBox
-        android:id="@+id/contest_other"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="false"
-        android:text="other" />
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

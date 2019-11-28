@@ -1,6 +1,8 @@
 package com.example.codeforcealarmer
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -123,23 +125,24 @@ class ContestRecyclerAdapter(private val context: Context, private var divFilter
         holder.bind(showingData[position])
     }
 
-    class ContestViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView), LayoutContainer{
+    inner class ContestViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView), LayoutContainer{
         override val containerView: View?
             get() = itemView
 
 
         fun bind(contest: Contest){
-            contest_id.text = "ID: " + contest.id.toString()
-            contestname.text = "NAME: " + contest.name
-            contest_phase.text = "PHASE: " + contest.phase.toString()
-            contest_duration.text = "DURATION: " + FormatHelper.formatSeconds(contest.durationSeconds)
-            contest_start_time.text = "START_TIME: " + FormatHelper.formatTime(contest.startTimeSeconds)
-            contest_web_url.text = contest.getUrl()
-            main_div1.isChecked = contest.contestType.div1
-            contest_div2.isChecked = contest.contestType.div2
-            contest_div3.isChecked = contest.contestType.div3
-            contest_other.isChecked = contest.contestType.other
+            contestname.text = contest.name
+            contest_phase.text = contest.phase.toString()
+            contest_duration.text = FormatHelper.formatSeconds(contest.durationSeconds)
+            contest_start_time.text = FormatHelper.formatTime(contest.startTimeSeconds)
 
+            containerView?.setOnClickListener {
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    data = Uri.parse(contest.getUrl())
+                }
+
+                context.startActivity(intent)
+            }
         }
     }
 
