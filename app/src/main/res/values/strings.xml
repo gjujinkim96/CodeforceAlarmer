@@ -13,4 +13,5 @@
     <string name="saved_is_div2" translatable="false">com.codeforcealarmer.SP_IS_DIV2</string>
     <string name="saved_is_div3" translatable="false">com.codeforcealarmer.SP_IS_DIV3</string>
     <string name="saved_is_other" translatable="false">com.codeforcealarmer.SP_IS_OTHER</string>
+    <string name="empty_text">There is no contest matching your setting.</string>
 </resources>

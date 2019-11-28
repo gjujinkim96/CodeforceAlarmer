@@ -16,13 +16,14 @@ import org.threeten.bp.*
 import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 
-class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<MutableList<Contest>>, TimePickerDialogFragment.ChangeTimeListener{
+class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<MutableList<Contest>>,
+    TimePickerDialogFragment.ChangeTimeListener, ContestRecyclerAdapter.EmptyStateListener{
     companion object {
         const val CONTEST_LOADER = 1
     }
 
     lateinit var recyclerAdapter: ContestRecyclerAdapter
-    lateinit var recyclerView: RecyclerView
+    private var isLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,12 +36,11 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<MutableL
 
         recyclerAdapter = ContestRecyclerAdapter(this, ContestType(true, true),
             startLocalTime, endLocalTime, Sorting.OLDEST, data)
+        recyclerAdapter.emptyStateListener = this
         onChangedTime(1, 0, 0)
         onChangedTime(2, 23, 59)
 
-        recyclerView = contest_recycler_view
-
-        recyclerView.apply{
+        contest_recycler_view.apply{
             adapter = recyclerAdapter
             layoutManager = LinearLayoutManager(this@MainActivity)
             addItemDecoration(DividerItemDecoration(this@MainActivity, DividerItemDecoration.VERTICAL))
@@ -126,6 +126,10 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<MutableL
     }
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<MutableList<Contest>> {
+        loading.visibility = View.VISIBLE
+        empty_group.visibility = View.GONE
+        contest_recycler_view.visibility = View.GONE
+        isLoading = true
         val url = "https://codeforces.com/api/contest.list"
         return ContestLoader(this, url)
     }
@@ -138,7 +142,9 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<MutableL
                 filteredData.add(it)
         }
 
+        isLoading = false
         recyclerAdapter.updateData(filteredData)
+        loading.visibility = View.GONE
     }
 
     override fun onLoaderReset(loader: Loader<MutableList<Contest>>) {
@@ -189,5 +195,19 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<MutableL
         }
 
         view.text = localTime.format(format)
+    }
+
+    override fun onEmptyStateEnter() {
+        if (!isLoading) {
+            empty_group.visibility = View.VISIBLE
+            contest_recycler_view.visibility = View.GONE
+        }
+    }
+
+    override fun onEmptyStateExit() {
+        if (!isLoading) {
+            empty_group.visibility = View.GONE
+            contest_recycler_view.visibility = View.VISIBLE
+        }
     }
 }
