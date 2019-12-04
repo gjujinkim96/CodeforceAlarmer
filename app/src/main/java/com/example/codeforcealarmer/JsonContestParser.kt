@@ -13,7 +13,7 @@ class JsonContestParser(input: String) {
     var status : Status
         private set
     private var comment : String? = null
-    var contests : ArrayList<Contest>? = null
+    var contests : MutableList<Contest>? = null
         private set
 
     init {
@@ -28,7 +28,7 @@ class JsonContestParser(input: String) {
             if (status == Status.FAILED){
                 comment = rootJson.getString("comment")
             }else{
-                contests = arrayListOf()
+                contests = mutableListOf()
                 var result = rootJson.getJSONArray("result")
                 for (i in 0 until result.length()){
                     val entry = result.getJSONObject(i)
