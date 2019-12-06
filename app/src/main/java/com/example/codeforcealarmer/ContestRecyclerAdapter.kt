@@ -23,7 +23,6 @@ enum class Sorting{
 class ContestRecyclerAdapter(private val context: Context, private var divFilter: ContestType, private var startTime: LocalTime,
                              private var endTime: LocalTime, private var sortingBy: Sorting, private var data: MutableList<Contest>)
     : RecyclerView.Adapter<ContestRecyclerAdapter.ContestViewHolder>() {
-    var emptyStateListener: EmptyStateListener? = null
     private var showingData: MutableList<Contest> = mutableListOf()
     init {
         makeShowingData()
@@ -73,15 +72,6 @@ class ContestRecyclerAdapter(private val context: Context, private var divFilter
             Sorting.OLDEST->{
                 showingData.sortBy { it.startTimeSeconds }
             }
-        }
-
-        val curEmptyStateListener = emptyStateListener
-
-        if (curEmptyStateListener != null){
-            if (showingData.isEmpty())
-                curEmptyStateListener.onEmptyStateEnter()
-            else
-                curEmptyStateListener.onEmptyStateExit()
         }
     }
 
@@ -144,10 +134,5 @@ class ContestRecyclerAdapter(private val context: Context, private var divFilter
                 context.startActivity(intent)
             }
         }
-    }
-
-    interface EmptyStateListener{
-        fun onEmptyStateEnter()
-        fun onEmptyStateExit()
     }
 }

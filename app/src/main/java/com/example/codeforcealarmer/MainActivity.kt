@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.Loader
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -32,6 +33,8 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Pair<Mut
         tabLayout.setupWithViewPager(viewpager)
 
         hasUpdatedFragment = MutableList(fragmentPagerAdapter.count) { false }
+
+
     }
 
     override fun onResume() {
@@ -49,6 +52,7 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Pair<Mut
     override fun onLoadFinished(loader: Loader<Pair<MutableList<Contest>, MutableList<Contest>>>, data: Pair<MutableList<Contest>, MutableList<Contest>>?) {
         fragmentPagerAdapter.setUpdateBuffer(data?.first, data?.second)
         fragmentPagerAdapter.finishedLoading()
+        Toast.makeText(this, "Loading finished", Toast.LENGTH_SHORT).show()
     }
 
     override fun onLoaderReset(loader: Loader<Pair<MutableList<Contest>, MutableList<Contest>>>) {

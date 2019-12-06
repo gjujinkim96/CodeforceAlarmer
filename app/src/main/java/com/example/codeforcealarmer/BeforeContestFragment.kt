@@ -14,8 +14,7 @@ import kotlinx.android.synthetic.main.before_contest_fragment.*
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
 
-class BeforeContestFragment : Fragment(), ContestRecyclerAdapter.EmptyStateListener,
-    ContestDataUpdater, View.OnClickListener {
+class BeforeContestFragment : Fragment(), ContestDataUpdater, View.OnClickListener {
     lateinit var recyclerAdapter: ContestRecyclerAdapter
     private var isLoading = false
     private var hasCreatedView = false
@@ -36,8 +35,6 @@ class BeforeContestFragment : Fragment(), ContestRecyclerAdapter.EmptyStateListe
 
         recyclerAdapter = ContestRecyclerAdapter(requireContext(), ContestType(true, true),
             startLocalTime, endLocalTime, Sorting.OLDEST, data)
-        recyclerAdapter.emptyStateListener = this
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -59,6 +56,8 @@ class BeforeContestFragment : Fragment(), ContestRecyclerAdapter.EmptyStateListe
             adapter = recyclerAdapter
             layoutManager = LinearLayoutManager(requireContext())
             addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            loadingView = loadingIcon
+            emptyView = empty_group
         }
 
         main_div1.setOnCheckedChangeListener{
@@ -160,28 +159,12 @@ class BeforeContestFragment : Fragment(), ContestRecyclerAdapter.EmptyStateListe
         view.text = localTime.format(format)
     }
 
-    override fun onEmptyStateEnter() {
-        if (!isLoading) {
-            empty_group.visibility = View.VISIBLE
-            contest_recycler_view.visibility = View.GONE
-        }
-    }
-
-    override fun onEmptyStateExit() {
-        if (!isLoading) {
-            empty_group.visibility = View.GONE
-            contest_recycler_view.visibility = View.VISIBLE
-        }
-    }
-
     private fun showLoading() {
-        loading.visibility = View.VISIBLE
-        empty_group.visibility = View.GONE
-        contest_recycler_view.visibility = View.GONE
+        contest_recycler_view.loading = true
     }
 
     private fun endLoading() {
-        loading.visibility = View.GONE
+        contest_recycler_view.loading = false
     }
 
     override fun onLoadingStart() {

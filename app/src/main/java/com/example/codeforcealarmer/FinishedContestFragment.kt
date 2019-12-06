@@ -1,7 +1,6 @@
 package com.example.codeforcealarmer
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,7 @@ import kotlinx.android.synthetic.main.after_contest_fragment.*
 import kotlinx.android.synthetic.main.after_contest_fragment.contest_recycler_view
 import org.threeten.bp.LocalTime
 
-class FinishedContestFragment : Fragment(), ContestRecyclerAdapter.EmptyStateListener, ContestDataUpdater {
+class FinishedContestFragment : Fragment(), ContestDataUpdater {
     lateinit var recyclerAdapter: ContestRecyclerAdapter
     private var isLoading = false
     private var hasCreatedView = false
@@ -27,7 +26,6 @@ class FinishedContestFragment : Fragment(), ContestRecyclerAdapter.EmptyStateLis
 
         recyclerAdapter = ContestRecyclerAdapter(requireContext(), ContestType(true, true, true, true),
             startLocalTime, endLocalTime, Sorting.LATEST, data)
-        recyclerAdapter.emptyStateListener = this
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,31 +44,17 @@ class FinishedContestFragment : Fragment(), ContestRecyclerAdapter.EmptyStateLis
             adapter = recyclerAdapter
             layoutManager = LinearLayoutManager(requireContext())
             addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        }
-    }
-
-    override fun onEmptyStateEnter() {
-        if (!isLoading) {
-            empty_group.visibility = View.VISIBLE
-            contest_recycler_view.visibility = View.GONE
-        }
-    }
-
-    override fun onEmptyStateExit() {
-        if (!isLoading) {
-            empty_group.visibility = View.GONE
-            contest_recycler_view.visibility = View.VISIBLE
+            emptyView = empty_group
+            loadingView = loadingIcon
         }
     }
 
     private fun showLoading() {
-        loading.visibility = View.VISIBLE
-        empty_group.visibility = View.GONE
-        contest_recycler_view.visibility = View.GONE
+        contest_recycler_view.loading = true
     }
 
     private fun endLoading() {
-        loading.visibility = View.GONE
+        contest_recycler_view.loading = false
     }
 
     override fun onLoadingStart() {

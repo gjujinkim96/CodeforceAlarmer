@@ -55,11 +55,8 @@ class FormatHelper {
             val curZoneId = ZoneId.systemDefault()
             val zoneDateTime = ZonedDateTime.ofInstant(instant, curZoneId)
 
-            val formatStyle = FormatStyle.valueOf("SHORT")
-            var dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(formatStyle)
-            dateTimeFormatter = DateTimeFormatter.ofPattern("MMM/dd/yyyy HH:mm'UTC'x", Locale.getDefault())
+            val dateTimeFormatter = DateTimeFormatter.ofPattern("MMM/dd/yyyy\nHH:mm", Locale.getDefault())
             return dateTimeFormatter.format(zoneDateTime)
-            return zoneDateTime.toString()
         }
     }
 }
