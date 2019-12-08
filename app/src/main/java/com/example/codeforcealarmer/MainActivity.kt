@@ -2,6 +2,7 @@ package com.example.codeforcealarmer
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -10,6 +11,7 @@ import androidx.loader.app.LoaderManager
 import androidx.loader.content.Loader
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.before_contest_fragment.*
 import java.util.*
 
 class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Pair<MutableList<Contest>, MutableList<Contest>>> ,
@@ -19,8 +21,10 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Pair<Mut
         const val CONTEST_LOADER = 1
     }
 
-    lateinit var hasUpdatedFragment: MutableList<Boolean>
     lateinit var fragmentPagerAdapter: MyFragmentPagerAdapter
+
+    lateinit var beforeUpdater: ContestDataUpdater
+    lateinit var afterUpdater: ContestDataUpdater
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,13 +32,15 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Pair<Mut
         setContentView(R.layout.activity_main)
 
         fragmentPagerAdapter = MyFragmentPagerAdapter(this, supportFragmentManager)
-        fragmentPagerAdapter.count
         viewpager.adapter = fragmentPagerAdapter
         tabLayout.setupWithViewPager(viewpager)
 
-        hasUpdatedFragment = MutableList(fragmentPagerAdapter.count) { false }
-
-
+        fragmentPagerAdapter.apply{
+            startUpdate(viewpager)
+            beforeUpdater = instantiateItem(viewpager, 0) as? ContestDataUpdater ?: throw ClassCastException()
+            afterUpdater = instantiateItem(viewpager, 1) as? ContestDataUpdater ?: throw ClassCastException()
+            finishUpdate(viewpager)
+        }
     }
 
     override fun onResume() {
@@ -44,19 +50,27 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Pair<Mut
     }
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Pair<MutableList<Contest>, MutableList<Contest>>> {
-        fragmentPagerAdapter.startLoading()
+        beforeUpdater.onLoadingStart()
+        afterUpdater.onLoadingStart()
+
         val url = "https://codeforces.com/api/contest.list"
+        Log.v("Attach", "onCreateLoader")
         return ContestLoader(this, url)
     }
 
     override fun onLoadFinished(loader: Loader<Pair<MutableList<Contest>, MutableList<Contest>>>, data: Pair<MutableList<Contest>, MutableList<Contest>>?) {
-        fragmentPagerAdapter.setUpdateBuffer(data?.first, data?.second)
-        fragmentPagerAdapter.finishedLoading()
-        Toast.makeText(this, "Loading finished", Toast.LENGTH_SHORT).show()
+        beforeUpdater.onLoadingEnd()
+        if (data?.first != null)
+            beforeUpdater.update(data.first)
+
+        afterUpdater.onLoadingEnd()
+        if (data?.second != null)
+            afterUpdater.update(data.second)
     }
 
     override fun onLoaderReset(loader: Loader<Pair<MutableList<Contest>, MutableList<Contest>>>) {
-        fragmentPagerAdapter.setUpdateBuffer(mutableListOf(), mutableListOf())
+        beforeUpdater.update(mutableListOf())
+        afterUpdater.update(mutableListOf())
     }
 
     override fun onChangedTime(clickedId: Int, hourOfDay: Int, minute: Int) {

@@ -16,19 +16,12 @@ import org.threeten.bp.format.DateTimeFormatter
 
 class BeforeContestFragment : Fragment(), ContestDataUpdater, View.OnClickListener {
     lateinit var recyclerAdapter: ContestRecyclerAdapter
-    private var isLoading = false
-    private var hasCreatedView = false
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Log.v("ORDER", "BeforeContestFragment:onAttach")
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.v("ORDER", "BeforeContestFragment:onCreate")
 
-        val data = arrayListOf<Contest>()
+        val data = mutableListOf<Contest>()
 
         val startLocalTime = LocalTime.of(0, 0)
         val endLocalTime = LocalTime.of(23, 59)
@@ -42,13 +35,6 @@ class BeforeContestFragment : Fragment(), ContestDataUpdater, View.OnClickListen
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        hasCreatedView = true
-        if (isLoading){
-            showLoading()
-        }else{
-            endLoading()
-        }
-
         changeTime(1, 0, 0)
         changeTime(2, 23, 59)
 
@@ -159,24 +145,12 @@ class BeforeContestFragment : Fragment(), ContestDataUpdater, View.OnClickListen
         view.text = localTime.format(format)
     }
 
-    private fun showLoading() {
+    override fun onLoadingStart() {
         contest_recycler_view.loading = true
     }
 
-    private fun endLoading() {
-        contest_recycler_view.loading = false
-    }
-
-    override fun onLoadingStart() {
-        isLoading = true
-        if (hasCreatedView)
-            showLoading()
-    }
-
     override fun onLoadingEnd() {
-        isLoading = false
-        if (hasCreatedView)
-            endLoading()
+        contest_recycler_view.loading = false
     }
 
     override fun update(newData: MutableList<Contest>) {

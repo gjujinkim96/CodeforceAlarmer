@@ -1,6 +1,8 @@
 package com.example.codeforcealarmer
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,11 +15,10 @@ import org.threeten.bp.LocalTime
 
 class FinishedContestFragment : Fragment(), ContestDataUpdater {
     lateinit var recyclerAdapter: ContestRecyclerAdapter
-    private var isLoading = false
-    private var hasCreatedView = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.v("ORDER", "FinishedContestFragment:startLoading")
 
         val data = mutableListOf<Contest>()
 
@@ -33,13 +34,6 @@ class FinishedContestFragment : Fragment(), ContestDataUpdater {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        hasCreatedView = true
-        if (isLoading){
-            showLoading()
-        }else{
-            endLoading()
-        }
-
         contest_recycler_view.apply{
             adapter = recyclerAdapter
             layoutManager = LinearLayoutManager(requireContext())
@@ -49,24 +43,12 @@ class FinishedContestFragment : Fragment(), ContestDataUpdater {
         }
     }
 
-    private fun showLoading() {
+    override fun onLoadingStart() {
         contest_recycler_view.loading = true
     }
 
-    private fun endLoading() {
-        contest_recycler_view.loading = false
-    }
-
-    override fun onLoadingStart() {
-        isLoading = true
-        if (hasCreatedView)
-            showLoading()
-    }
-
     override fun onLoadingEnd() {
-        isLoading = false
-        if (hasCreatedView)
-            endLoading()
+        contest_recycler_view.loading = false
     }
 
     override fun update(newData: MutableList<Contest>) {
