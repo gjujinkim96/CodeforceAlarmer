@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.after_contest_fragment.*
@@ -15,6 +17,7 @@ import org.threeten.bp.LocalTime
 
 class FinishedContestFragment : Fragment(), ContestDataUpdater {
     lateinit var recyclerAdapter: ContestRecyclerAdapter
+    private val viewModel: ContestViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +44,18 @@ class FinishedContestFragment : Fragment(), ContestDataUpdater {
             emptyView = empty_group
             loadingView = loadingIcon
         }
+
+
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer {
+            if (it)
+                onLoadingStart()
+            else
+                onLoadingEnd()
+        })
+
+        viewModel.afterContests.observe(viewLifecycleOwner, Observer {
+            recyclerAdapter.updateData(it)
+        })
     }
 
     override fun onLoadingStart() {

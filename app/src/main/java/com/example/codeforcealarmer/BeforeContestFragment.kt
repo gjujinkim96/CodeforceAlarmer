@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.before_contest_fragment.*
@@ -16,6 +18,7 @@ import org.threeten.bp.format.DateTimeFormatter
 
 class BeforeContestFragment : Fragment(), ContestDataUpdater, View.OnClickListener {
     lateinit var recyclerAdapter: ContestRecyclerAdapter
+    private val viewModel: ContestViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +71,17 @@ class BeforeContestFragment : Fragment(), ContestDataUpdater, View.OnClickListen
 
         before_time_button.setOnClickListener(this)
         after_time_button.setOnClickListener(this)
+
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer{
+            if (it)
+                onLoadingStart()
+            else
+                onLoadingEnd()
+        })
+
+        viewModel.beforeContests.observe(viewLifecycleOwner, Observer {
+            recyclerAdapter.updateData(it)
+        })
     }
 
     override fun onResume() {
