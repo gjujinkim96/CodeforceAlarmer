@@ -2,7 +2,6 @@ package com.example.codeforcealarmer
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,67 +15,50 @@ import kotlinx.android.synthetic.main.before_contest_fragment.*
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
 
-class BeforeContestFragment : Fragment(), ContestDataUpdater, View.OnClickListener {
-    lateinit var recyclerAdapter: ContestRecyclerAdapter
-    private val viewModel: ContestViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.v("ORDER", "BeforeContestFragment:onCreate")
-
-        val data = mutableListOf<Contest>()
-
-        val startLocalTime = LocalTime.of(0, 0)
-        val endLocalTime = LocalTime.of(23, 59)
-
-        recyclerAdapter = ContestRecyclerAdapter(requireContext(), ContestType(true, true),
-            startLocalTime, endLocalTime, Sorting.OLDEST, data)
-    }
+class BeforeContestFragment : Fragment(), View.OnClickListener {
+    private lateinit var recyclerAdapter: ContestRecyclerAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.before_contest_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        changeTime(1, 0, 0)
-        changeTime(2, 23, 59)
-
-        contest_recycler_view.apply{
+        recyclerAdapter = ContestRecyclerAdapter(requireContext(), Sorting.OLDEST)
+        before_contest_recycler_view.apply{
             adapter = recyclerAdapter
             layoutManager = LinearLayoutManager(requireContext())
             addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-            loadingView = loadingIcon
-            emptyView = empty_group
+            loadingView = before_loadingIcon
+            emptyView = before_empty_group
         }
 
         main_div1.setOnCheckedChangeListener{
                 _, isChecked ->
-            recyclerAdapter.changeDivFilter(isChecked, ContestType.Type.DIV1)
+            recyclerAdapter.changeSetting(newIsDiv1Checked = isChecked)
         }
 
         main_div2.setOnCheckedChangeListener{
                 _, isChecked ->
-            recyclerAdapter.changeDivFilter(isChecked, ContestType.Type.DIV2)
+            recyclerAdapter.changeSetting(newIsDiv2Checked = isChecked)
         }
 
         main_div3.setOnCheckedChangeListener{
                 _, isChecked ->
-            recyclerAdapter.changeDivFilter(isChecked, ContestType.Type.DIV3)
+            recyclerAdapter.changeSetting(newIsDiv3Checked = isChecked)
         }
 
         main_other.setOnCheckedChangeListener{
                 _, isChecked ->
-            recyclerAdapter.changeDivFilter(isChecked, ContestType.Type.OTHER)
+            recyclerAdapter.changeSetting(newIsOtherChecked = isChecked)
         }
 
         before_time_button.setOnClickListener(this)
         after_time_button.setOnClickListener(this)
 
+        val viewModel: ContestViewModel by viewModels()
+
         viewModel.isLoading.observe(viewLifecycleOwner, Observer{
-            if (it)
-                onLoadingStart()
-            else
-                onLoadingEnd()
+            before_contest_recycler_view.loading = it
         })
 
         viewModel.beforeContests.observe(viewLifecycleOwner, Observer {
@@ -108,14 +90,7 @@ class BeforeContestFragment : Fragment(), ContestDataUpdater, View.OnClickListen
         main_div3.isChecked = isDiv3Checked
         main_other.isChecked = isOtherChecked
 
-        recyclerAdapter.apply{
-            changeStartTime(startLocalTime)
-            changeEndTime(endLocalTime)
-            changeDivFilter(isDiv1Checked, ContestType.Type.DIV1)
-            changeDivFilter(isDiv2Checked, ContestType.Type.DIV2)
-            changeDivFilter(isDiv3Checked, ContestType.Type.DIV3)
-            changeDivFilter(isOtherChecked, ContestType.Type.OTHER)
-        }
+        recyclerAdapter.changeSetting(startLocalTime, endLocalTime, isDiv1Checked, isDiv2Checked, isDiv3Checked, isOtherChecked)
     }
 
     override fun onPause() {
@@ -146,11 +121,11 @@ class BeforeContestFragment : Fragment(), ContestDataUpdater, View.OnClickListen
 
         val view = when (clickedId){
             1 -> {
-                recyclerAdapter.changeStartTime(localTime)
+                recyclerAdapter.changeSetting(newStartTime = localTime)
                 before_time_button
             }
             2 -> {
-                recyclerAdapter.changeEndTime(localTime)
+                recyclerAdapter.changeSetting(newEndTime = localTime)
                 after_time_button
             }
             else -> return
@@ -158,19 +133,6 @@ class BeforeContestFragment : Fragment(), ContestDataUpdater, View.OnClickListen
 
         view.text = localTime.format(format)
     }
-
-    override fun onLoadingStart() {
-        contest_recycler_view.loading = true
-    }
-
-    override fun onLoadingEnd() {
-        contest_recycler_view.loading = false
-    }
-
-    override fun update(newData: MutableList<Contest>) {
-        recyclerAdapter.updateData(newData)
-    }
-
 
     override fun onClick(view: View?){
         val button = view as? Button ?: return
@@ -192,11 +154,15 @@ class BeforeContestFragment : Fragment(), ContestDataUpdater, View.OnClickListen
         val bundle = Bundle().apply {
             putInt("hour", hour.toInt())
             putInt("min", min.toInt())
+            putInt("clicked_id", id)
         }
 
-        val dialogFragment = TimePickerDialogFragment(id).apply {
+
+        val dialogFragment = TimePickerDialogFragment().apply {
             arguments = bundle
+            setTargetFragment(this@BeforeContestFragment, 0)
         }
+
         dialogFragment.show(ft, "timePicker")
 
     }

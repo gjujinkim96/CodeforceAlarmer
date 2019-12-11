@@ -18,7 +18,7 @@ enum class Phase{
 }
 
 
-class ContestType(isDiv1: Boolean = false, isDiv2: Boolean = false, isDiv3: Boolean = false, isOther: Boolean = false){
+class ContestType(isDiv1: Boolean = true, isDiv2: Boolean = true, isDiv3: Boolean = true, isOther: Boolean = true){
     enum class Type{
         DIV1, DIV2, DIV3, OTHER
     }

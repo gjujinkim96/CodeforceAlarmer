@@ -29,7 +29,7 @@ class JsonContestParser(input: String) {
                 comment = rootJson.getString("comment")
             }else{
                 contests = mutableListOf()
-                var result = rootJson.getJSONArray("result")
+                val result = rootJson.getJSONArray("result")
                 for (i in 0 until result.length()){
                     val entry = result.getJSONObject(i)
                     val id = entry.getInt("id")
@@ -47,23 +47,9 @@ class JsonContestParser(input: String) {
         }
     }
 
-    fun getIntOrNull(name: String, jsonObject: JSONObject) =
-        try{
-            jsonObject.getInt(name)
-        }catch (e : JSONException){
-            null
-        }
-
-    fun getLongOrNull(name: String, jsonObject: JSONObject) =
+    private fun getLongOrNull(name: String, jsonObject: JSONObject) =
         try{
             jsonObject.getLong(name)
-        }catch (e : JSONException){
-            null
-        }
-
-    fun getStringOrNull(name: String, jsonObject: JSONObject) =
-        try{
-            jsonObject.getString(name)
         }catch (e : JSONException){
             null
         }

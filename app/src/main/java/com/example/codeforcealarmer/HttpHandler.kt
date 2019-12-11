@@ -58,7 +58,7 @@ class HttpHandler {
             return ret
         }
 
-        fun readText(inputStream: InputStream): String {
+        private fun readText(inputStream: InputStream): String {
             val sb = StringBuilder()
             val br = BufferedReader(InputStreamReader(inputStream, "utf-8"))
             try {

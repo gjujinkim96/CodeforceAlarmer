@@ -1,10 +1,7 @@
 package com.example.codeforcealarmer
 
-import android.app.Application
 import android.os.AsyncTask
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import java.util.*

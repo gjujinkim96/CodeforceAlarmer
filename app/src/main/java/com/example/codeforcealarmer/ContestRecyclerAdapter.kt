@@ -13,8 +13,6 @@ import org.threeten.bp.Instant
 import org.threeten.bp.LocalTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
-import java.util.*
-import kotlin.collections.ArrayList
 
 enum class Sorting{
     LATEST, OLDEST
@@ -24,6 +22,10 @@ class ContestRecyclerAdapter(private val context: Context, private var divFilter
                              private var endTime: LocalTime, private var sortingBy: Sorting, private var data: MutableList<Contest>)
     : RecyclerView.Adapter<ContestRecyclerAdapter.ContestViewHolder>() {
     private var showingData: MutableList<Contest> = mutableListOf()
+
+    constructor(context: Context, sortingBy: Sorting) : this(context, ContestType(),
+        LocalTime.of(0, 0), LocalTime.of(23, 59), sortingBy, mutableListOf())
+
     init {
         makeShowingData()
     }
@@ -73,35 +75,47 @@ class ContestRecyclerAdapter(private val context: Context, private var divFilter
                 showingData.sortBy { it.startTimeSeconds }
             }
         }
+
+        notifyDataSetChanged()
     }
 
-    fun changeDivFilter(newValue: Boolean, toChange: ContestType.Type){
-        if (divFilter.setType(newValue, toChange)){
-            makeShowingData()
-            notifyDataSetChanged()
-        }
-    }
-
-    fun changeStartTime(newStartTime: LocalTime){
-        if (startTime != newStartTime){
+    fun changeSetting(newStartTime: LocalTime? = null,
+                      newEndTime: LocalTime? = null,
+                      newIsDiv1Checked: Boolean? = null,
+                      newIsDiv2Checked: Boolean? = null,
+                      newIsDiv3Checked: Boolean? = null,
+                      newIsOtherChecked: Boolean? = null){
+        var hasDataSetChanged = false
+        if (newStartTime != null && startTime != newStartTime){
             startTime = newStartTime
-            makeShowingData()
-            notifyDataSetChanged()
+            hasDataSetChanged = true
         }
-    }
 
-    fun changeEndTime(newEndTime: LocalTime){
-        if (endTime != newEndTime){
+        if (newEndTime != null && endTime != newEndTime){
             endTime = newEndTime
+            hasDataSetChanged = true
+        }
+
+        if (newIsDiv1Checked != null && divFilter.setType(newIsDiv1Checked, ContestType.Type.DIV1))
+            hasDataSetChanged = true
+
+        if (newIsDiv2Checked != null && divFilter.setType(newIsDiv2Checked, ContestType.Type.DIV2))
+            hasDataSetChanged = true
+
+        if (newIsDiv3Checked != null && divFilter.setType(newIsDiv3Checked, ContestType.Type.DIV3))
+            hasDataSetChanged = true
+
+        if (newIsOtherChecked != null && divFilter.setType(newIsOtherChecked, ContestType.Type.OTHER))
+            hasDataSetChanged = true
+
+        if (hasDataSetChanged){
             makeShowingData()
-            notifyDataSetChanged()
         }
     }
 
     fun updateData(newData : MutableList<Contest>){
         data = newData
         makeShowingData()
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContestViewHolder {
