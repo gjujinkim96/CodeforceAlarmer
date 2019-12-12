@@ -25,6 +25,8 @@ class FinishedContestFragment : Fragment() {
             addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             emptyView = after_empty_group
             loadingView = after_loadingIcon
+            emptyText = after_empty_text
+            emptyIcon = after_empty_image
         }
 
 
@@ -35,6 +37,10 @@ class FinishedContestFragment : Fragment() {
 
         viewModel.afterContests.observe(viewLifecycleOwner, Observer {
             recyclerAdapter.updateData(it)
+        })
+
+        viewModel.isInternetConnection.observe(viewLifecycleOwner, Observer {
+            after_contest_recycler_view.isInternetConnection = it
         })
     }
 }

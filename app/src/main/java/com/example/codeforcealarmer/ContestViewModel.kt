@@ -1,12 +1,20 @@
 package com.example.codeforcealarmer
 
+import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.AsyncTask
+import android.os.Build
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import java.util.*
 
-class ContestViewModel : ViewModel() {
+class ContestViewModel(application: Application) : AndroidViewModel(application) {
     val beforeContests: MutableLiveData<MutableList<Contest>> by lazy {
         MutableLiveData<MutableList<Contest>>()
     }
@@ -19,6 +27,10 @@ class ContestViewModel : ViewModel() {
         MutableLiveData<Boolean>()
     }
 
+    val isInternetConnection: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
     init {
         val url = "https://codeforces.com/api/contest.list"
         loadData(url)
@@ -27,7 +39,35 @@ class ContestViewModel : ViewModel() {
     private fun loadData(url: String){
         isLoading.value = true
 
-        ContestAsyncTask().execute(url)
+        if (isThereInternet()) {
+            isInternetConnection.value = true
+            ContestAsyncTask().execute(url)
+        }
+        else{
+            beforeContests.value = mutableListOf()
+            afterContests.value = mutableListOf()
+            isInternetConnection.value = false
+            isLoading.value = false
+        }
+    }
+
+    private fun isThereInternet(): Boolean {
+        val cm = getApplication<Application>().applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as?
+                ConnectivityManager ?: throw IllegalArgumentException()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val nw = cm.activeNetwork ?: return false
+            val actNw = cm.getNetworkCapabilities(nw) ?: return false
+            return when {
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        }else{
+            val newInfo = cm.activeNetworkInfo ?: return false
+            return newInfo.isConnected
+        }
     }
 
     inner class ContestAsyncTask : AsyncTask<String, Void, Pair<MutableList<Contest>, MutableList<Contest>>>(){

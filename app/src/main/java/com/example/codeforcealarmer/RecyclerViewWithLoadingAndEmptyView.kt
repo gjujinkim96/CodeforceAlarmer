@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.res.Resources
 import android.util.AttributeSet
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class RecyclerViewWithLoadingAndEmptyView(context: Context, attrs: AttributeSet) : RecyclerView(context, attrs) {
@@ -12,12 +14,30 @@ class RecyclerViewWithLoadingAndEmptyView(context: Context, attrs: AttributeSet)
             field = value
             handleEmpty()
         }
+    var emptyText: TextView? = null
+        set(value){
+            field = value
+            handleEmpty()
+        }
+
+    var emptyIcon: ImageView? = null
+        set(value){
+            field = value
+            handleEmpty()
+        }
+
     var loadingView: View? = null
         set(value){
             field = value
             handleEmpty()
         }
     var loading: Boolean = false
+        set(value) {
+            field = value
+            handleEmpty()
+        }
+
+    var isInternetConnection: Boolean = false
         set(value) {
             field = value
             handleEmpty()
@@ -49,6 +69,14 @@ class RecyclerViewWithLoadingAndEmptyView(context: Context, attrs: AttributeSet)
             loadingView?.visibility = View.GONE
             if (emptyView != null && adapter?.itemCount == 0){
                 emptyView?.visibility = View.VISIBLE
+                if (isInternetConnection){
+                    emptyText?.text = context.getString(R.string.empty_text)
+                    emptyIcon?.setImageResource(android.R.drawable.ic_delete)
+                }else{
+                    emptyText?.text = context.getString(R.string.no_internet_text)
+                    emptyIcon?.setImageResource(android.R.drawable.ic_menu_help)
+                }
+
                 visibility = View.GONE
             }else{
                 emptyView?.visibility = View.GONE

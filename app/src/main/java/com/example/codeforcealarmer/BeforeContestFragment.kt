@@ -30,6 +30,8 @@ class BeforeContestFragment : Fragment(), View.OnClickListener {
             addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             loadingView = before_loadingIcon
             emptyView = before_empty_group
+            emptyText = before_empty_text
+            emptyIcon = before_empty_image
         }
 
         main_div1.setOnCheckedChangeListener{
@@ -63,6 +65,10 @@ class BeforeContestFragment : Fragment(), View.OnClickListener {
 
         viewModel.beforeContests.observe(viewLifecycleOwner, Observer {
             recyclerAdapter.updateData(it)
+        })
+
+        viewModel.isInternetConnection.observe(viewLifecycleOwner, Observer {
+            before_contest_recycler_view.isInternetConnection = it
         })
     }
 
