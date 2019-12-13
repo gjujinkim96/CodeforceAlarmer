@@ -31,16 +31,20 @@ class ContestViewModel(application: Application) : AndroidViewModel(application)
         MutableLiveData<Boolean>()
     }
 
-    init {
-        val url = "https://codeforces.com/api/contest.list"
-        loadData(url)
+    val isRefreshing: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
     }
 
-    private fun loadData(url: String){
+    init {
+        Log.v("VIEWMODEL_INIT", "INIT")
         isLoading.value = true
+        isRefreshing.value = false
+        loadData()
+    }
 
+    fun loadData(){
+        val url = "https://codeforces.com/api/contest.list"
         if (isThereInternet()) {
-            isInternetConnection.value = true
             ContestAsyncTask().execute(url)
         }
         else{
@@ -48,6 +52,7 @@ class ContestViewModel(application: Application) : AndroidViewModel(application)
             afterContests.value = mutableListOf()
             isInternetConnection.value = false
             isLoading.value = false
+            isRefreshing.value = false
         }
     }
 
@@ -72,7 +77,7 @@ class ContestViewModel(application: Application) : AndroidViewModel(application)
 
     inner class ContestAsyncTask : AsyncTask<String, Void, Pair<MutableList<Contest>, MutableList<Contest>>>(){
         override fun doInBackground(vararg args: String?): Pair<MutableList<Contest>, MutableList<Contest>> {
-            if (args == null || args.isEmpty()){
+            if (args.isEmpty()){
                 Log.e(this::class.java.simpleName, "there is no input url")
                 return Pair(mutableListOf(), mutableListOf())
             }
@@ -112,7 +117,10 @@ class ContestViewModel(application: Application) : AndroidViewModel(application)
                 afterContests.value = result.second
             }
 
+            Log.v("LOADING_STUFF", "loading done")
+            isInternetConnection.value = isThereInternet()
             isLoading.value = false
+            isRefreshing.value = false
         }
 
         override fun onCancelled(result: Pair<MutableList<Contest>, MutableList<Contest>>?) {

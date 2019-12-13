@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -30,7 +31,7 @@ class FinishedContestFragment : Fragment() {
         }
 
 
-        val viewModel: ContestViewModel by viewModels()
+        val viewModel: ContestViewModel by activityViewModels()
         viewModel.isLoading.observe(viewLifecycleOwner, Observer {
             after_contest_recycler_view.loading = it
         })

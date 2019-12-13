@@ -2,6 +2,10 @@ package com.example.codeforcealarmer
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import androidx.activity.viewModels
+import androidx.lifecycle.Observer
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -24,6 +28,19 @@ class MainActivity : AppCompatActivity() {
                     throw IllegalArgumentException("current fragment must be BeforeContestFragment")
             instantiateItem(viewpager, 1)
             finishUpdate(viewpager)
+        }
+
+        val viewModel: ContestViewModel by viewModels()
+
+        viewModel.isRefreshing.observe(this, Observer {
+            Log.v("VIEWMODEL_TEST", "observed isRefreshing")
+            if (it == false)
+                main_swipelayout.isRefreshing = false
+        })
+
+        main_swipelayout.setOnRefreshListener {
+            viewModel.isRefreshing.value = true
+            viewModel.loadData()
         }
     }
 }
