@@ -82,7 +82,7 @@ data class Contest(val id: Int, val name: String, val contestType: ContestType, 
                    val durationSeconds: Long, val startTimeSeconds: Long?){
     companion object{
         fun makeContest(id: Int, name: String, phase: Phase, durationSeconds: Long, startTimeSeconds: Long?) : Contest{
-            val contestType = ContestType()
+            val contestType = ContestType(false, false, false, false)
             if (name.contains("Div. 1", true))
                 contestType.div1 = true
             if (name.contains("Div. 2", true))

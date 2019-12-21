@@ -1,6 +1,8 @@
 package com.example.codeforcealarmer
 
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -12,7 +14,7 @@ import java.net.URL
 
 class HttpHandler {
     companion object {
-        fun fetchFromUrl(url: String): String? {
+        suspend fun fetchFromUrl(url: String): String? = withContext(Dispatchers.IO){
             val urlObject =
                 try {
                     URL(url)
@@ -55,7 +57,7 @@ class HttpHandler {
                 httpConnection?.disconnect()
             }
 
-            return ret
+            ret
         }
 
         private fun readText(inputStream: InputStream): String {

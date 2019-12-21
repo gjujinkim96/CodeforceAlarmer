@@ -19,7 +19,7 @@ class FinishedContestFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val recyclerAdapter = ContestRecyclerAdapter(requireContext(), Sorting.LATEST)
+        val recyclerAdapter = ContestRecyclerAdapter(requireContext(), Sorting.LATEST, false)
         after_contest_recycler_view.apply{
             adapter = recyclerAdapter
             layoutManager = LinearLayoutManager(requireContext())

@@ -26,7 +26,7 @@ class BeforeContestFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        recyclerAdapter = ContestRecyclerAdapter(requireContext(), Sorting.OLDEST)
+        recyclerAdapter = ContestRecyclerAdapter(requireContext(), Sorting.OLDEST, true)
         before_contest_recycler_view.apply{
             adapter = recyclerAdapter
             layoutManager = LinearLayoutManager(requireContext())

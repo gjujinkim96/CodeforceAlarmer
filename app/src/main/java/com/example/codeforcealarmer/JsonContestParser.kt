@@ -1,22 +1,25 @@
 package com.example.codeforcealarmer
 
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import kotlin.IllegalArgumentException
 
-class JsonContestParser(input: String) {
+class JsonContestParser(private val input: String) {
     enum class Status{
-        OK, FAILED
+        OK, FAILED, NOT_PARSED
     }
 
-    var status : Status
+    var status : Status = Status.NOT_PARSED
         private set
     private var comment : String? = null
     var contests : MutableList<Contest>? = null
         private set
 
-    init {
+
+    suspend fun parse(): Unit = withContext(Dispatchers.Default){
         try {
             val rootJson = JSONObject(input)
             status = when(rootJson.getString("status")){

@@ -24,10 +24,9 @@
         android:id="@+id/contest_phase"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="@+id/contest_duration"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/recycler_alarm_button"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/contest_duration"
         app:layout_constraintTop_toTopOf="@+id/contest_duration"
@@ -39,7 +38,6 @@
         android:layout_height="wrap_content"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="@+id/contest_start_time"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/contest_phase"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/contest_start_time"
@@ -65,9 +63,9 @@
     <Space
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="113dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contest_duration" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -91,5 +89,17 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ToggleButton
+        android:id="@+id/recycler_alarm_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:textOff="Alarm Off"
+        android:textOn="Alarm On"
+        app:layout_constraintBaseline_toBaselineOf="@+id/contest_phase"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/contest_phase" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

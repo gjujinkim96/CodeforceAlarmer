@@ -12,9 +12,13 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.*
 import java.util.*
 
 class ContestViewModel(application: Application) : AndroidViewModel(application) {
+    val coroutineScope = viewModelScope + Dispatchers.Default + Dispatchers.IO
+
     val beforeContests: MutableLiveData<MutableList<Contest>> by lazy {
         MutableLiveData<MutableList<Contest>>()
     }
@@ -42,10 +46,15 @@ class ContestViewModel(application: Application) : AndroidViewModel(application)
         loadData()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        coroutineScope.cancel()
+    }
+
     fun loadData(){
         val url = "https://codeforces.com/api/contest.list"
         if (isThereInternet()) {
-            ContestAsyncTask().execute(url)
+            viewModelScope.launch(CoroutineName("getContest")){ getContest(url) }
         }
         else{
             beforeContests.value = mutableListOf()
@@ -75,58 +84,54 @@ class ContestViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    inner class ContestAsyncTask : AsyncTask<String, Void, Pair<MutableList<Contest>, MutableList<Contest>>>(){
-        override fun doInBackground(vararg args: String?): Pair<MutableList<Contest>, MutableList<Contest>> {
-            if (args.isEmpty()){
-                Log.e(this::class.java.simpleName, "there is no input url")
-                return Pair(mutableListOf(), mutableListOf())
-            }
+    private suspend fun getContest(url: String){
+        try {
+            val results_async =
+                viewModelScope.async(CoroutineName("getContestAsync")) { getContestAsync(url) }
 
-            val url = args[0] ?: return Pair(mutableListOf(), mutableListOf())
+            val results = results_async.await()
 
-            val jsonString = HttpHandler.fetchFromUrl(url)
-            if (jsonString == null){
-                Log.e(this::class.java.simpleName, "failed to read jsonString")
-                return Pair(mutableListOf(), mutableListOf())
-            }
-
-            val jsonResult =  JsonContestParser(jsonString)
-            if (jsonResult.status != JsonContestParser.Status.OK) {
-                Log.e(this::class.java.simpleName, "there was error parsing JSON")
-                return Pair(mutableListOf(), mutableListOf())
-            }
-
-            val curContest = jsonResult.contests
-
-            val phaseFilter = EnumSet.range(Phase.BEFORE, Phase.CODING)
-            val beforeTmp: MutableList<Contest> = mutableListOf()
-            val afterTmp: MutableList<Contest> = mutableListOf()
-            curContest?.forEach {
-                if (phaseFilter.contains(it.phase))
-                    beforeTmp.add(it)
-                else
-                    afterTmp.add(it)
-            }
-
-            return Pair(beforeTmp, afterTmp)
-        }
-
-        override fun onPostExecute(result: Pair<MutableList<Contest>, MutableList<Contest>>?) {
-            if (result != null){
-                beforeContests.value = result.first
-                afterContests.value = result.second
-            }
+            beforeContests.value = results.first
+            afterContests.value = results.second
 
             Log.v("LOADING_STUFF", "loading done")
             isInternetConnection.value = isThereInternet()
             isLoading.value = false
             isRefreshing.value = false
         }
-
-        override fun onCancelled(result: Pair<MutableList<Contest>, MutableList<Contest>>?) {
+        catch (e: CancellationException){
+            Log.v("COROUTINE_CHECK", "caught cancel")
             isLoading.value = false
             beforeContests.value = mutableListOf()
             afterContests.value = mutableListOf()
         }
+    }
+
+    private suspend fun getContestAsync(url: String): Pair<MutableList<Contest>, MutableList<Contest>>{
+        val jsonString =HttpHandler.fetchFromUrl(url)
+        if (jsonString == null){
+            Log.e(this::class.java.simpleName, "failed to read jsonString")
+            return Pair(mutableListOf(), mutableListOf())
+        }
+
+        val jsonResult =  JsonContestParser(jsonString).apply { parse() }
+        if (jsonResult.status != JsonContestParser.Status.OK) {
+            Log.e(this::class.java.simpleName, "there was error parsing JSON")
+            return Pair(mutableListOf(), mutableListOf())
+        }
+
+        val curContest = jsonResult.contests
+
+        val phaseFilter = EnumSet.range(Phase.BEFORE, Phase.CODING)
+        val beforeTmp: MutableList<Contest> = mutableListOf()
+        val afterTmp: MutableList<Contest> = mutableListOf()
+        curContest?.forEach {
+            if (phaseFilter.contains(it.phase))
+                beforeTmp.add(it)
+            else
+                afterTmp.add(it)
+        }
+
+        return Pair(beforeTmp, afterTmp)
     }
 }
