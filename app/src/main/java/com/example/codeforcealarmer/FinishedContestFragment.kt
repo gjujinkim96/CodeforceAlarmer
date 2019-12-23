@@ -19,7 +19,7 @@ class FinishedContestFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val recyclerAdapter = ContestRecyclerAdapter(requireContext(), Sorting.LATEST, false)
+        val recyclerAdapter = ContestRecyclerAdapter(requireContext(), mutableListOf(),false)
         after_contest_recycler_view.apply{
             adapter = recyclerAdapter
             layoutManager = LinearLayoutManager(requireContext())
@@ -32,16 +32,18 @@ class FinishedContestFragment : Fragment() {
 
 
         val viewModel: ContestViewModel by activityViewModels()
-        viewModel.isLoading.observe(viewLifecycleOwner, Observer {
-            after_contest_recycler_view.loading = it
-        })
+        viewModel.apply {
+            isLoading.observe(viewLifecycleOwner, Observer {
+                after_contest_recycler_view.loading = it
+            })
 
-        viewModel.afterContests.observe(viewLifecycleOwner, Observer {
-            recyclerAdapter.updateData(it)
-        })
+            afterContests.observe(viewLifecycleOwner, Observer {
+                recyclerAdapter.updateData(it)
+            })
 
-        viewModel.isInternetConnection.observe(viewLifecycleOwner, Observer {
-            after_contest_recycler_view.isInternetConnection = it
-        })
+            isInternetConnection.observe(viewLifecycleOwner, Observer {
+                after_contest_recycler_view.isInternetConnection = it
+            })
+        }
     }
 }

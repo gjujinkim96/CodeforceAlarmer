@@ -20,13 +20,14 @@ import org.threeten.bp.format.DateTimeFormatter
 
 class BeforeContestFragment : Fragment(), View.OnClickListener {
     private lateinit var recyclerAdapter: ContestRecyclerAdapter
+    private val viewModel: ContestViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.before_contest_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        recyclerAdapter = ContestRecyclerAdapter(requireContext(), Sorting.OLDEST, true)
+        recyclerAdapter = ContestRecyclerAdapter(requireContext(), mutableListOf(), true)
         before_contest_recycler_view.apply{
             adapter = recyclerAdapter
             layoutManager = LinearLayoutManager(requireContext())
@@ -37,43 +38,43 @@ class BeforeContestFragment : Fragment(), View.OnClickListener {
             emptyIcon = before_empty_image
         }
 
+        viewModel.apply{
+            isLoading.observe(viewLifecycleOwner, Observer{
+                before_contest_recycler_view.loading = it
+            })
+
+            beforeContests.observe(viewLifecycleOwner, Observer {
+                Log.v("VIEWMODEL_TEST", "observed beforeContest")
+                recyclerAdapter.updateData(it)
+            })
+
+            isInternetConnection.observe(viewLifecycleOwner, Observer {
+                before_contest_recycler_view.isInternetConnection = it
+            })
+        }
+
         main_div1.setOnCheckedChangeListener{
                 _, isChecked ->
-            recyclerAdapter.changeSetting(newIsDiv1Checked = isChecked)
+            viewModel.changeBeforeSetting(newIsDiv1Checked = isChecked)
         }
 
         main_div2.setOnCheckedChangeListener{
                 _, isChecked ->
-            recyclerAdapter.changeSetting(newIsDiv2Checked = isChecked)
+            viewModel.changeBeforeSetting(newIsDiv2Checked = isChecked)
         }
 
         main_div3.setOnCheckedChangeListener{
                 _, isChecked ->
-            recyclerAdapter.changeSetting(newIsDiv3Checked = isChecked)
+            viewModel.changeBeforeSetting(newIsDiv3Checked = isChecked)
         }
 
         main_other.setOnCheckedChangeListener{
                 _, isChecked ->
-            recyclerAdapter.changeSetting(newIsOtherChecked = isChecked)
+            viewModel.changeBeforeSetting(newIsOtherChecked = isChecked)
         }
 
         before_time_button.setOnClickListener(this)
         after_time_button.setOnClickListener(this)
-
-        val viewModel: ContestViewModel by activityViewModels()
-
-        viewModel.isLoading.observe(viewLifecycleOwner, Observer{
-            before_contest_recycler_view.loading = it
-        })
-
-        viewModel.beforeContests.observe(viewLifecycleOwner, Observer {
-            Log.v("VIEWMODEL_TEST", "observed beforeContest")
-            recyclerAdapter.updateData(it)
-        })
-
-        viewModel.isInternetConnection.observe(viewLifecycleOwner, Observer {
-            before_contest_recycler_view.isInternetConnection = it
-        })
     }
 
     override fun onResume() {
@@ -100,27 +101,32 @@ class BeforeContestFragment : Fragment(), View.OnClickListener {
         main_div3.isChecked = isDiv3Checked
         main_other.isChecked = isOtherChecked
 
-        recyclerAdapter.changeSetting(startLocalTime, endLocalTime, isDiv1Checked, isDiv2Checked, isDiv3Checked, isOtherChecked)
+        viewModel.changeBeforeSetting(startLocalTime, endLocalTime, isDiv1Checked, isDiv2Checked, isDiv3Checked, isOtherChecked)
     }
 
     override fun onPause() {
         super.onPause()
 
         val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.shared_preference_key), Context.MODE_PRIVATE)
-        val startHour = recyclerAdapter.getStartHour()
-        val startMin = recyclerAdapter.getStartMin()
-        val endHour = recyclerAdapter.getEndHour()
-        val endMin = recyclerAdapter.getEndMin()
+        val startTime = viewModel.startTime
+        val startHour = startTime.hour
+        val startMin = startTime.minute
+
+        val endTime = viewModel.endTime
+        val endHour = endTime.hour
+        val endMin = endTime.minute
+
+        val divFilter = viewModel.divFilter
 
         sharedPreferences.edit().apply{
             putInt(getString(R.string.saved_start_hour), startHour)
             putInt(getString(R.string.saved_start_min), startMin)
             putInt(getString(R.string.saved_end_hour), endHour)
             putInt(getString(R.string.saved_end_min), endMin)
-            putBoolean(getString(R.string.saved_is_div1), recyclerAdapter.isDiv1())
-            putBoolean(getString(R.string.saved_is_div2), recyclerAdapter.isDiv2())
-            putBoolean(getString(R.string.saved_is_div3), recyclerAdapter.isDiv3())
-            putBoolean(getString(R.string.saved_is_other), recyclerAdapter.isOther())
+            putBoolean(getString(R.string.saved_is_div1), divFilter.div1)
+            putBoolean(getString(R.string.saved_is_div2), divFilter.div2)
+            putBoolean(getString(R.string.saved_is_div3), divFilter.div3)
+            putBoolean(getString(R.string.saved_is_other), divFilter.other)
             apply()
         }
     }
@@ -131,11 +137,11 @@ class BeforeContestFragment : Fragment(), View.OnClickListener {
 
         val view = when (clickedId){
             1 -> {
-                recyclerAdapter.changeSetting(newStartTime = localTime)
+                viewModel.changeBeforeSetting(newStartTime = localTime)
                 before_time_button
             }
             2 -> {
-                recyclerAdapter.changeSetting(newEndTime = localTime)
+                viewModel.changeBeforeSetting(newEndTime = localTime)
                 after_time_button
             }
             else -> return

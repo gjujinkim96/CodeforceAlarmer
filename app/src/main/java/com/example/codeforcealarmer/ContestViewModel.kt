@@ -14,15 +14,26 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import org.threeten.bp.Instant
+import org.threeten.bp.LocalTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
 import java.util.*
 
 class ContestViewModel(application: Application) : AndroidViewModel(application) {
-    val coroutineScope = viewModelScope + Dispatchers.Default + Dispatchers.IO
+    private val coroutineScope = viewModelScope + Dispatchers.Default + Dispatchers.IO
+    private var isBeforeUpdating: Boolean = false
+    private var isBeforeRestart: Boolean = false
+    private val mutex: Mutex = Mutex()
 
+    private var beforeContestRaw: MutableList<Contest> = mutableListOf()
     val beforeContests: MutableLiveData<MutableList<Contest>> by lazy {
         MutableLiveData<MutableList<Contest>>()
     }
 
+    private var afterContestRaw: MutableList<Contest> = mutableListOf()
     val afterContests: MutableLiveData<MutableList<Contest>> by lazy {
         MutableLiveData<MutableList<Contest>>()
     }
@@ -39,6 +50,13 @@ class ContestViewModel(application: Application) : AndroidViewModel(application)
         MutableLiveData<Boolean>()
     }
 
+    var divFilter: ContestType = ContestType()
+        private set
+    var startTime: LocalTime = LocalTime.now()
+        private set
+    var endTime: LocalTime = LocalTime.now()
+        private set
+
     init {
         Log.v("VIEWMODEL_INIT", "INIT")
         isLoading.value = true
@@ -51,17 +69,107 @@ class ContestViewModel(application: Application) : AndroidViewModel(application)
         coroutineScope.cancel()
     }
 
-    fun loadData(){
-        val url = "https://codeforces.com/api/contest.list"
-        if (isThereInternet()) {
-            viewModelScope.launch(CoroutineName("getContest")){ getContest(url) }
+    fun changeBeforeSetting(newStartTime: LocalTime? = null,
+                      newEndTime: LocalTime? = null,
+                      newIsDiv1Checked: Boolean? = null,
+                      newIsDiv2Checked: Boolean? = null,
+                      newIsDiv3Checked: Boolean? = null,
+                      newIsOtherChecked: Boolean? = null){
+        var hasDataSetChanged = false
+        if (newStartTime != null && startTime != newStartTime){
+            startTime = newStartTime
+            hasDataSetChanged = true
         }
-        else{
-            beforeContests.value = mutableListOf()
-            afterContests.value = mutableListOf()
-            isInternetConnection.value = false
-            isLoading.value = false
-            isRefreshing.value = false
+
+        if (newEndTime != null && endTime != newEndTime){
+            endTime = newEndTime
+            hasDataSetChanged = true
+        }
+
+        if (newIsDiv1Checked != null && divFilter.setType(newIsDiv1Checked, ContestType.Type.DIV1))
+            hasDataSetChanged = true
+
+        if (newIsDiv2Checked != null && divFilter.setType(newIsDiv2Checked, ContestType.Type.DIV2))
+            hasDataSetChanged = true
+
+        if (newIsDiv3Checked != null && divFilter.setType(newIsDiv3Checked, ContestType.Type.DIV3))
+            hasDataSetChanged = true
+
+        if (newIsOtherChecked != null && divFilter.setType(newIsOtherChecked, ContestType.Type.OTHER))
+            hasDataSetChanged = true
+
+        if (hasDataSetChanged && beforeContestRaw.isNotEmpty()){
+            coroutineScope.launch(Dispatchers.Main) { makeBeforeContestData() }
+        }
+    }
+
+
+    private fun filter(rawData: MutableList<Contest>?) : MutableList<Contest>{
+        val ret = arrayListOf<Contest>()
+
+        if (rawData == null)
+            return ret
+
+        rawData.forEach{
+            if (it.startTimeSeconds != null){
+                val instant = Instant.ofEpochSecond(it.startTimeSeconds)
+                val zoneId = ZoneId.systemDefault()
+                val zonedDateTime = ZonedDateTime.ofInstant(instant, zoneId)
+                val localTime = zonedDateTime.toLocalTime()
+                if (divFilter.contains(it.contestType)){
+                    if (startTime <= endTime){
+                        if (startTime <= localTime && localTime <= endTime)
+                            ret.add(it)
+                    } else if (startTime <= localTime || localTime <= endTime)
+                        ret.add(it)
+                }
+            }
+        }
+
+        return ret
+    }
+
+    private suspend fun makeBeforeContestData(){
+        Log.v("COOROUTINE_TIME", "Start")
+
+        mutex.withLock {
+            if (isBeforeUpdating) {
+                isBeforeRestart = true
+                return
+            }
+            else{
+                isBeforeUpdating = true
+            }
+        }
+
+        var isRunning: Boolean = true
+        while (isRunning){
+            mutex.withLock {
+                isBeforeRestart = false
+            }
+
+            beforeContests.value = withContext(Dispatchers.Default) {
+                filter(beforeContestRaw).apply {
+                    sortBy { it.startTimeSeconds }
+                }
+            }
+
+            mutex.withLock {
+                isRunning = isBeforeRestart
+                if (!isRunning){
+                    isBeforeUpdating = false
+                }
+            }
+        }
+
+        Log.v("COOROUTINE_TIME", "end")
+    }
+
+    private suspend fun makeAfterContestData(){
+        afterContests.value = withContext(Dispatchers.Default){
+            afterContestRaw.apply{
+                sortByDescending { it.startTimeSeconds }
+            }
         }
     }
 
@@ -84,15 +192,34 @@ class ContestViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+
+    fun loadData(){
+        val url = "https://codeforces.com/api/contest.list"
+        if (isThereInternet()) {
+            viewModelScope.launch(CoroutineName("getContest")){ getContest(url) }
+        }
+        else{
+            beforeContestRaw = mutableListOf()
+            afterContestRaw = mutableListOf()
+            beforeContests.value = mutableListOf()
+            afterContests.value = mutableListOf()
+            isInternetConnection.value = false
+            isLoading.value = false
+            isRefreshing.value = false
+        }
+    }
+
     private suspend fun getContest(url: String){
         try {
-            val results_async =
+            val resultsAsync =
                 viewModelScope.async(CoroutineName("getContestAsync")) { getContestAsync(url) }
 
-            val results = results_async.await()
+            val results = resultsAsync.await()
 
-            beforeContests.value = results.first
-            afterContests.value = results.second
+            beforeContestRaw = results.first
+            afterContestRaw = results.second
+            makeBeforeContestData()
+            makeAfterContestData()
 
             Log.v("LOADING_STUFF", "loading done")
             isInternetConnection.value = isThereInternet()
@@ -102,6 +229,8 @@ class ContestViewModel(application: Application) : AndroidViewModel(application)
         catch (e: CancellationException){
             Log.v("COROUTINE_CHECK", "caught cancel")
             isLoading.value = false
+            beforeContestRaw = mutableListOf()
+            afterContestRaw = mutableListOf()
             beforeContests.value = mutableListOf()
             afterContests.value = mutableListOf()
         }
