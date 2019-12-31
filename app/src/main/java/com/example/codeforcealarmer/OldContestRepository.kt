@@ -1,13 +1,41 @@
 package com.example.codeforcealarmer
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import java.util.*
 
-class ContestRepository {
-    private suspend fun getContestAsync(url: String): Pair<MutableList<Contest>, MutableList<Contest>>{
+class OldContestRepository {
+    companion object {
+        val url = "https://codeforces.com/api/contest.list"
+    }
+
+    var beforeContests: MutableList<Contest> = mutableListOf()
+        private set
+    var afterContests: MutableLiveData<List<Contest>> = MutableLiveData()
+        private set
+    var contestFilter: ContestFilter = ContestFilter()
+        private set
+
+    suspend fun getNew(){
+        val (beforeTmp, afterTmp) = getNewHelper()
+        beforeContests = beforeTmp
+
+        afterContests.value = withContext(Dispatchers.Default){
+            afterTmp.sortedByDescending { it.startTimeSeconds }
+        }
+    }
+
+    suspend fun changeFilter(newFilter: ContestFilter){
+        contestFilter = newFilter
+    }
+
+    private suspend fun getNewHelper(): Pair<MutableList<Contest>, MutableList<Contest>>{
         val jsonString =HttpHandler.fetchFromUrl(url)
         if (jsonString == null){
             Log.e(this::class.java.simpleName, "failed to read jsonString")

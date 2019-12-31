@@ -55,22 +55,22 @@ class BeforeContestFragment : Fragment(), View.OnClickListener {
 
         main_div1.setOnCheckedChangeListener{
                 _, isChecked ->
-            viewModel.changeBeforeSetting(newIsDiv1Checked = isChecked)
+            viewModel.changeBeforeSetting(newcontestType = ContestType.makeTypeTrue(Type.DIV1))
         }
 
         main_div2.setOnCheckedChangeListener{
                 _, isChecked ->
-            viewModel.changeBeforeSetting(newIsDiv2Checked = isChecked)
+            viewModel.changeBeforeSetting(newcontestType = ContestType.makeTypeTrue(Type.DIV2))
         }
 
         main_div3.setOnCheckedChangeListener{
                 _, isChecked ->
-            viewModel.changeBeforeSetting(newIsDiv3Checked = isChecked)
+            viewModel.changeBeforeSetting(newcontestType = ContestType.makeTypeTrue(Type.DIV3))
         }
 
         main_other.setOnCheckedChangeListener{
                 _, isChecked ->
-            viewModel.changeBeforeSetting(newIsOtherChecked = isChecked)
+            viewModel.changeBeforeSetting(newcontestType = ContestType.makeTypeTrue(Type.OTHER))
         }
 
         before_time_button.setOnClickListener(this)
@@ -101,22 +101,25 @@ class BeforeContestFragment : Fragment(), View.OnClickListener {
         main_div3.isChecked = isDiv3Checked
         main_other.isChecked = isOtherChecked
 
-        viewModel.changeBeforeSetting(startLocalTime, endLocalTime, isDiv1Checked, isDiv2Checked, isDiv3Checked, isOtherChecked)
+        val newContestType = ContestType(isDiv1Checked, isDiv2Checked, isDiv3Checked, isOtherChecked)
+
+        viewModel.changeBeforeSetting(startLocalTime, endLocalTime, newContestType)
     }
 
     override fun onPause() {
         super.onPause()
 
         val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.shared_preference_key), Context.MODE_PRIVATE)
-        val startTime = viewModel.startTime
+        val contestFilter = viewModel.contestFilter
+        val startTime = contestFilter.startTime
         val startHour = startTime.hour
         val startMin = startTime.minute
 
-        val endTime = viewModel.endTime
+        val endTime = contestFilter.endTime
         val endHour = endTime.hour
         val endMin = endTime.minute
 
-        val divFilter = viewModel.divFilter
+        val divFilter = contestFilter.divFilter
 
         sharedPreferences.edit().apply{
             putInt(getString(R.string.saved_start_hour), startHour)
