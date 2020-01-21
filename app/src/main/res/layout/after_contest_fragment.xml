@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.activity_fragments.MainActivity">
 
-    <com.example.codeforcealarmer.RecyclerViewWithLoadingAndEmptyView
+    <com.example.codeforcealarmer.ui.recyclerview.RecyclerViewWithLoadingAndEmptyView
         android:id="@+id/after_contest_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"

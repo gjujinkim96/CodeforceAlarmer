@@ -17,4 +17,8 @@
     <string name="no_internet_text">There is no internet connection right now.</string>
     <string name="tab_before">Before</string>
     <string name="tab_finished">Finished</string>
+    <string name="intent_alarm_data" translatable="false">com.codeforcealarmer.INTENT_ALARM_DATA</string>
+    <string name="alarm_notifyer_channel_id" translatable="false">ALARM_CHANNEL_ID</string>
+    <string name="contest_alarm_name">Contest Alarm</string>
+    <string name="contest_alarm_description">Alarm for notifying upcoming contest.</string>
 </resources>
