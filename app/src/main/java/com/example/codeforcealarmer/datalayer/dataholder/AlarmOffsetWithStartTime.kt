@@ -11,25 +11,19 @@ import kotlinx.android.parcel.Parcelize
 data class AlarmOffsetWithStartTime(
     var id: Int,
     var startTime: Long?,
-    var offset: Long) : Parcelable {
+    var alarmData: AlarmData) : Parcelable {
 
     companion object{
-        val CREATOR = object : Parcelable.Creator<AlarmOffsetWithStartTime> {
-            override fun createFromParcel(source: Parcel?): AlarmOffsetWithStartTime? {
-                if (source == null)
-                    return null
-                val id = source.readInt()
-                val startTime = source.readLong()
-                val offset = source.readLong()
-                return AlarmOffsetWithStartTime(id, startTime, offset)
-            }
-
-            override fun newArray(size: Int): Array<AlarmOffsetWithStartTime> {
-                throw UnsupportedOperationException()
-            }
-
+        val creator by lazy {
+            parcelableCreator<AlarmOffsetWithStartTime>()
         }
     }
+}
+
+inline fun <reified T : Parcelable> parcelableCreator(): Parcelable.Creator<T>{
+    val creator = T::class.java.getField("CREATOR").get(null)
+    @Suppress("UNCHECKED_CAST")
+    return creator as Parcelable.Creator<T>
 }
 
 class ParcelConverter{

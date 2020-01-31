@@ -33,7 +33,7 @@ class DataSaverService : JobIntentService() {
     override fun onHandleWork(intent: Intent) {
         val key = getString(R.string.intent_alarm_data)
         val bytes = intent?.extras?.getByteArray(key) ?: throw IllegalArgumentException()
-        val alarmData = ParcelConverter.unmarshall(bytes, AlarmOffsetWithStartTime.CREATOR)
+        val alarmData = ParcelConverter.unmarshall(bytes, AlarmOffsetWithStartTime.creator)
         Log.v("SERVICE_TEST", "got service $alarmData")
 
         var contestTitle: String = ""
@@ -44,7 +44,7 @@ class DataSaverService : JobIntentService() {
         val channelId = getString(R.string.alarm_notifyer_channel_id)
         var builder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("$contestTitle is starting in 1 Hour!")
+            .setContentTitle("$contestTitle is starting in ${alarmData.alarmData.name}")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         val notificationId = alarmData.id
@@ -54,7 +54,7 @@ class DataSaverService : JobIntentService() {
 
         runBlocking {
             Log.v("ALARM_INPUT", "delete from service")
-            alarmOffsetRepo.delete(alarmData.id)
+            alarmOffsetRepo.delete(alarmData.id, alarmData.alarmData)
         }
     }
 }

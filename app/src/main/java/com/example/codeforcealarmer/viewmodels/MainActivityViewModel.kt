@@ -7,12 +7,15 @@ import com.example.codeforcealarmer.datalayer.repo.ContestRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import android.util.Log
+import android.widget.Toast
+import com.example.codeforcealarmer.datalayer.dataholder.LoadContestResult
 
 class MainActivityViewModel(val contestRepo: ContestRepo) : ViewModel() {
     init {
         viewModelScope.launch {
-            contestRepo.updateCodingPhase()
-            contestRepo.updateFinishedPhase()
+            val updatedCodingPhase = contestRepo.updateCodingPhase()
+            val updatedFinishedPhase = contestRepo.updateFinishedPhase()
+            //Log.v("CALLED_THREE", "coding: $updatedCodingPhase,  finished: $updatedFinishedPhase")
         }
     }
 
@@ -20,8 +23,8 @@ class MainActivityViewModel(val contestRepo: ContestRepo) : ViewModel() {
         MutableLiveData<Boolean>()
     }
 
-    val isThereNetwork: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>()
+    val loadingState: MutableLiveData<LoadContestResult> by lazy {
+        MutableLiveData<LoadContestResult>()
     }
 
     fun load(){
@@ -32,6 +35,7 @@ class MainActivityViewModel(val contestRepo: ContestRepo) : ViewModel() {
             isLoading.value = false
 
             // handle no network
+            loadingState.value = loadResult
         }
     }
 

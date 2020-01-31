@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/before_recyclerview_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/before_contestname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/before_guideline2"
+        app:layout_constraintStart_toStartOf="@id/before_guideline"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="This is Contest name is very large and very hard and very very fun(rated for Div. 1, Div. 2)" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/before_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="16dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/before_guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="16dp" />
+
+    <TextView
+        android:id="@+id/before_contest_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/before_contest_start_time"
+        app:layout_constraintEnd_toStartOf="@+id/before_contest_phase"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/before_contest_start_time"
+        app:layout_constraintTop_toTopOf="@+id/before_contest_start_time"
+        tools:text="duration" />
+
+    <TextView
+        android:id="@+id/before_contest_phase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/before_contest_duration"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/before_contest_duration"
+        app:layout_constraintTop_toTopOf="@+id/before_contest_duration"
+        tools:text="phase" />
+
+    <TextView
+        android:id="@+id/before_contest_start_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toStartOf="@+id/before_contest_duration"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/before_contestname"
+        tools:text="Dec/12/2019\n21:05" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/before_barrier2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="before_contest_duration,before_contest_phase,before_contest_start_time"
+        tools:layout_editor_absoluteY="731dp" />
+
+    <ToggleButton
+        android:id="@+id/before_hour_alarm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="ToggleButton"
+        android:textOff="1H"
+        android:textOn="SET"
+        app:layout_constraintEnd_toStartOf="@+id/before_15_alarm"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/before_barrier2" />
+
+    <ToggleButton
+        android:id="@+id/before_15_alarm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ToggleButton"
+        android:textOff="15MIN"
+        android:textOn="SET"
+        app:layout_constraintBaseline_toBaselineOf="@+id/before_hour_alarm"
+        app:layout_constraintEnd_toStartOf="@+id/before_5_alarm"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/before_hour_alarm" />
+
+    <ToggleButton
+        android:id="@+id/before_5_alarm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ToggleButton"
+        android:textOff="5MIN"
+        android:textOn="SET"
+        app:layout_constraintBaseline_toBaselineOf="@+id/before_15_alarm"
+        app:layout_constraintEnd_toStartOf="@+id/before_0_alarm"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/before_15_alarm" />
+
+    <ToggleButton
+        android:id="@+id/before_0_alarm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ToggleButton"
+        android:textOff="0MIN"
+        android:textOn="SET"
+        app:layout_constraintBaseline_toBaselineOf="@+id/before_5_alarm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/before_5_alarm" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/before_barrier3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="before_0_alarm,before_15_alarm,before_hour_alarm,before_5_alarm"
+        tools:layout_editor_absoluteY="731dp" />
+
+    <Space
+        android:id="@+id/before_end_space"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/before_barrier3" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,10 +2,7 @@ package com.example.codeforcealarmer.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.codeforcealarmer.datalayer.dataholder.AlarmOffset
-import com.example.codeforcealarmer.datalayer.dataholder.Contest
-import com.example.codeforcealarmer.datalayer.dataholder.ContestFilter
-import com.example.codeforcealarmer.datalayer.dataholder.ContestWithAlarm
+import com.example.codeforcealarmer.datalayer.dataholder.*
 import com.example.codeforcealarmer.datalayer.repo.AlarmOffsetRepo
 import com.example.codeforcealarmer.datalayer.repo.ContestFilterRepo
 import com.example.codeforcealarmer.datalayer.repo.ContestRepo
@@ -15,12 +12,12 @@ import kotlinx.coroutines.launch
 import org.threeten.bp.LocalTime
 
 class BeforeContestViewModel(
-    private val contestWithAlarmRepo: ContestWithAlarmRepo,
+    contestWithAlarmRepo: ContestWithAlarmRepo,
     private val contestFilterRepo: ContestFilterRepo,
     private val alarmRepo: AlarmOffsetRepo
 )
     : ViewModel() {
-    val contestsData = contestWithAlarmRepo.getBeforeContests()
+    val contestsData = contestWithAlarmRepo.getContests()
     val filterLiveData: LiveData<ContestFilter> = contestFilterRepo.contestFilterLiveData
     val filteredData: MediatorLiveData<List<ContestWithAlarm>> = MediatorLiveData()
 
@@ -67,28 +64,26 @@ class BeforeContestViewModel(
         if (contestFilter == null)
             return contestData
 
-        val ret = mutableListOf<ContestWithAlarm>()
-        contestData.forEach{
+        return contestData.mapNotNull {
             if (contestFilter.contains(it))
-                ret.add(it)
+                it
+            else
+                null
         }
-
-        return ret
     }
 
-    fun addAlarm(id: Int, offset: Long){
+    fun addAlarm(id: Int, data: AlarmData){
         Log.v("ALARM_INPUT", "addAlarm")
         viewModelScope.launch(Dispatchers.IO) {
             Log.v("ALARM_INPUT", "addAlarm:ViewScope")
-            alarmRepo.insert(AlarmOffset(id, offset))
-            Log.v("ALARM_INPUT", "some + " + alarmRepo.getAll().toString())
+            alarmRepo.insert(AlarmOffset(id, data))
         }
     }
 
-    fun delAlarm(id: Int){
+    fun delAlarm(id: Int, data: AlarmData){
         viewModelScope.launch(Dispatchers.IO) {
             Log.v("ALARM_INPUT", "delete from view model")
-            alarmRepo.delete(id)
+            alarmRepo.delete(id, data)
         }
     }
 

@@ -111,11 +111,12 @@ class BeforeContestFragment : Fragment(), View.OnClickListener, ContestWithAlarm
         after_time_button.setOnClickListener(this)
     }
 
-    override fun OnChecked(id: Int, startTime: Long, isChecked: Boolean){
+    override fun onChecked(id: Int, startTime: Long, isChecked: Boolean, offsetTime: Long?){
         val alarmMgr: AlarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager? ?:
         throw Exception("Expected AlarmManger")
 
-        val offset: Long = -60 * 60
+        val offset = offsetTime ?: throw Exception(IllegalArgumentException())
+
         val alarmSetData =
             AlarmOffsetWithStartTime(
                 id,
@@ -137,11 +138,13 @@ class BeforeContestFragment : Fragment(), View.OnClickListener, ContestWithAlarm
 
         if (isChecked){
             Log.v("ALARM_TEST", "set alarm")
-//            alarmMgr.set(AlarmManager.RTC, startTime + offset, alarmIntent)
-            //alarmMgr.cancel(alarmIntent)
+            if (offset != 0L)
+                alarmMgr.set(AlarmManager.RTC, startTime + offset, alarmIntent)
+            else
+                alarmMgr.setExact(AlarmManager.RTC, startTime, alarmIntent)
+
             Log.v("ALARM_SET", "    at ${System.currentTimeMillis()  + 30 * 1000}")
             Log.v("ALARM_SET", "set at ${System.currentTimeMillis() }")
-            alarmMgr.set(AlarmManager.RTC, System.currentTimeMillis() + 60 * 1000, alarmIntent)
             viewModel.addAlarm(id, offset)
         }else{
             Log.v("ALARM_TEST", "cancel alarm")

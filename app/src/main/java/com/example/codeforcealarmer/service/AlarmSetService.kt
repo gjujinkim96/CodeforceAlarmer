@@ -17,6 +17,7 @@ import androidx.core.app.JobIntentService
 import com.example.codeforcealarmer.R
 import com.example.codeforcealarmer.application.MyApplication
 import com.example.codeforcealarmer.broadcast.AlarmReceiver
+import com.example.codeforcealarmer.datalayer.dataholder.AlarmData
 import com.example.codeforcealarmer.datalayer.dataholder.ParcelConverter
 import kotlinx.coroutines.*
 import java.lang.Runnable
@@ -42,12 +43,14 @@ class AlarmSetService : JobIntentService() {
             val alarmData = alarmWithStartTimeRepo.getAlarmedData()
             val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
             alarmData.forEach {
+                val startTime = it.startTime ?: return@forEach
+
                 val intent = Intent(this@AlarmSetService, AlarmReceiver::class.java)
                 intent.putExtra(getString(R.string.intent_alarm_data), ParcelConverter.marshall(it))
 
                 val alarmIntent = PendingIntent.getBroadcast(this@AlarmSetService, it.id, intent, PendingIntent.FLAG_CANCEL_CURRENT)
 
-                alarmManager.set(AlarmManager.RTC, System.currentTimeMillis() + 5 * 1000, alarmIntent)
+                alarmManager.set(AlarmManager.RTC, startTime - AlarmData.getOffsetInMilli(it.alarmData), alarmIntent)
             }
         }
     }

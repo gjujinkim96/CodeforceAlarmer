@@ -22,7 +22,7 @@ class AlarmReceiver : BroadcastReceiver() {
         Log.v("BOOT_ALERT", "alarm receiver received")
         val key = context.getString(R.string.intent_alarm_data)
         val bytes = intent.extras.getByteArray(key) ?: throw IllegalArgumentException()
-        val alarmData = ParcelConverter.unmarshall(bytes, AlarmOffsetWithStartTime.CREATOR)
+        val alarmData = ParcelConverter.unmarshall(bytes, AlarmOffsetWithStartTime.creator)
         Log.v("SERVICE_TEST", "got alarm $alarmData")
 
 

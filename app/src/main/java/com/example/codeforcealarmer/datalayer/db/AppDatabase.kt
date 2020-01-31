@@ -7,13 +7,10 @@ import com.example.codeforcealarmer.datalayer.dao.AlarmOffsetDao
 import com.example.codeforcealarmer.datalayer.dao.AlarmOffsetWithStartTimeDao
 import com.example.codeforcealarmer.datalayer.dao.ContestDao
 import com.example.codeforcealarmer.datalayer.dao.ContestWithAlarmDao
-import com.example.codeforcealarmer.datalayer.dataholder.AlarmOffset
-import com.example.codeforcealarmer.datalayer.dataholder.AlarmOffsetWithStartTime
-import com.example.codeforcealarmer.datalayer.dataholder.Contest
-import com.example.codeforcealarmer.datalayer.dataholder.PhaseConverters
+import com.example.codeforcealarmer.datalayer.dataholder.*
 
 @Database(entities = [Contest::class, AlarmOffset::class], version = 1)
-@TypeConverters(PhaseConverters::class)
+@TypeConverters(PhaseConverters::class, AlarmDataConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun contestDao() : ContestDao
     abstract fun alarmOffsetDao() : AlarmOffsetDao

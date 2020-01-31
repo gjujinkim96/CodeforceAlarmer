@@ -104,7 +104,7 @@
         android:id="@+id/before_empty_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/empty_text"
+        android:text="@string/before_empty_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/before_empty_image"
         app:layout_constraintHorizontal_bias="0.5"

@@ -37,15 +37,14 @@ class RecyclerViewWithLoadingAndEmptyView(context: Context, attrs: AttributeSet)
             handleEmpty()
         }
 
-    var isInternetConnection: Boolean = false
-        set(value) {
-            field = value
-            handleEmpty()
-        }
-
     private val observer = object : AdapterDataObserver(){
         override fun onChanged() {
             super.onChanged()
+            handleEmpty()
+        }
+
+        override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+            super.onItemRangeChanged(positionStart, itemCount, payload)
             handleEmpty()
         }
 
@@ -54,8 +53,18 @@ class RecyclerViewWithLoadingAndEmptyView(context: Context, attrs: AttributeSet)
             handleEmpty()
         }
 
+        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+            super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+            handleEmpty()
+        }
+
         override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
             super.onItemRangeRemoved(positionStart, itemCount)
+            handleEmpty()
+        }
+
+        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+            super.onItemRangeInserted(positionStart, itemCount)
             handleEmpty()
         }
     }
@@ -69,13 +78,6 @@ class RecyclerViewWithLoadingAndEmptyView(context: Context, attrs: AttributeSet)
             loadingView?.visibility = View.GONE
             if (emptyView != null && adapter?.itemCount == 0){
                 emptyView?.visibility = View.VISIBLE
-                if (isInternetConnection){
-                    emptyText?.text = context.getString(R.string.empty_text)
-                    emptyIcon?.setImageResource(android.R.drawable.ic_delete)
-                }else{
-                    emptyText?.text = context.getString(R.string.no_internet_text)
-                    emptyIcon?.setImageResource(android.R.drawable.ic_menu_help)
-                }
 
                 visibility = View.GONE
             }else{

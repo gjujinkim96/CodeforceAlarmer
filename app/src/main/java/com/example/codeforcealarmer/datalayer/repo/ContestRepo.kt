@@ -26,12 +26,12 @@ class ContestRepo(val contestDao: ContestDao, val networkChecker: NetworkChecker
 
     // load inner function where current return return null or data
     // and outer function if ret was null check internet and return appropriate loadcontestrsult
-    suspend fun load() : Pair<LoadContestResult, List<Contest>?> {
+    suspend fun load() : LoadContestResult {
         val contests = loadContest() ?:
-            return Pair(if (networkChecker.isThereInternet()) LoadContestResult.OTHER_ERROR else LoadContestResult.NETWORK_ERROR, null)
+            return if (networkChecker.isThereInternet()) LoadContestResult.OTHER_ERROR else LoadContestResult.NETWORK_ERROR
 
-        val ret = contestDao.upsert(contests)
-        return Pair(LoadContestResult.OKAY, ret)
+        contestDao.upsert(contests)
+        return LoadContestResult.OKAY
     }
 
     suspend fun getName(id: Int) = contestDao.getName(id)

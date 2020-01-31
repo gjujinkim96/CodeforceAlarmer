@@ -1,45 +1,39 @@
 package com.example.codeforcealarmer.ui.adapters
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.codeforcealarmer.broadcast.AlarmReceiver
 import com.example.codeforcealarmer.format.FormatHelper
 import com.example.codeforcealarmer.R
-import com.example.codeforcealarmer.datalayer.dataholder.AlarmOffsetWithStartTime
 import com.example.codeforcealarmer.datalayer.dataholder.Contest
 import com.example.codeforcealarmer.datalayer.dataholder.getUrl
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.contest_recycler_item.*
+import kotlinx.android.synthetic.main.before_contest_recycler_item.*
 
 open class ContestRecyclerAdapter(private val context: Context, protected open var data: List<Contest>)
     : RecyclerView.Adapter<ContestRecyclerAdapter.ContestViewHolder>() {
+    private val differ = AsyncListDiffer(this, DIFF_CALLBACK)
 
     fun updateData(newData : List<Contest>){
-        data = newData
-        notifyDataSetChanged()
+        differ.submitList(newData)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContestViewHolder {
-        val newView = LayoutInflater.from(context).inflate(R.layout.contest_recycler_item, parent, false).apply{
-            findViewById<Button>(R.id.recycler_alarm_button).visibility = View.GONE
-        }
+        val newView = LayoutInflater.from(context).inflate(R.layout.before_contest_recycler_item, parent, false)
 
         return ContestViewHolder(newView)
     }
 
-    override fun getItemCount() = data.size
+    override fun getItemCount() = differ.currentList.size
 
     override fun onBindViewHolder(holder: ContestViewHolder, position: Int) {
-        holder.bind(data, position)
+        holder.bind(differ.currentList, position)
     }
 
     inner class ContestViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView), LayoutContainer{
@@ -67,6 +61,16 @@ open class ContestRecyclerAdapter(private val context: Context, protected open v
 
                 context.startActivity(intent)
             }
+        }
+    }
+
+    companion object {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Contest>() {
+            override fun areItemsTheSame(oldItem: Contest, newItem: Contest) =
+                oldItem.id == newItem.id
+
+            override fun areContentsTheSame(oldItem: Contest, newItem: Contest) =
+                oldItem == newItem
         }
     }
 }
