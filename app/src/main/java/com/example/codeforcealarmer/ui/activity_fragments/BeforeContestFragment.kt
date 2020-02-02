@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ToggleButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -20,9 +21,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.codeforcealarmer.application.MyApplication
 import com.example.codeforcealarmer.R
 import com.example.codeforcealarmer.broadcast.AlarmReceiver
+import com.example.codeforcealarmer.datalayer.dataholder.AlarmData
 import com.example.codeforcealarmer.datalayer.dataholder.AlarmOffsetWithStartTime
 import com.example.codeforcealarmer.datalayer.dataholder.ParcelConverter
 import com.example.codeforcealarmer.ui.adapters.ContestWithAlarmRecyclerAdapter
+import com.example.codeforcealarmer.ui.adapters.disableAlarmButton
 import com.example.codeforcealarmer.viewmodels.BeforeContestViewModel
 import com.example.codeforcealarmer.viewmodels.BeforeViewModelFactory
 import kotlinx.android.synthetic.main.before_contest_fragment.*
@@ -111,24 +114,24 @@ class BeforeContestFragment : Fragment(), View.OnClickListener, ContestWithAlarm
         after_time_button.setOnClickListener(this)
     }
 
-    override fun onChecked(id: Int, startTime: Long, isChecked: Boolean, offsetTime: Long?){
+    override fun onChecked(toggleButton: ToggleButton, id: Int, startTime: Long, isChecked: Boolean, alarmData: AlarmData){
+        val curTime = System.currentTimeMillis()
+        if (curTime + AlarmData.getOffsetInMilli(alarmData) >= startTime * 1000){
+            disableAlarmButton(toggleButton)
+            return
+        }
+
         val alarmMgr: AlarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager? ?:
         throw Exception("Expected AlarmManger")
-
-        val offset = offsetTime ?: throw Exception(IllegalArgumentException())
 
         val alarmSetData =
             AlarmOffsetWithStartTime(
                 id,
                 startTime,
-                offset
+                alarmData
             )
 
         Log.v("SERVICE_TEST", "alarmdata $alarmSetData")
-//        val alarmIntent: PendingIntent = Intent(requireContext(), AlarmReceiver::class.java).let {
-//            it.putExtra(requireContext().getString(R.string.intent_alarm_data), ParcelConverter.marshall(alarmSetData))
-//            PendingIntent.getBroadcast(requireContext(), 0, it, 0)
-//        }
 
         val intent = Intent(requireContext(), AlarmReceiver::class.java)
         intent.putExtra(requireContext().getString(R.string.intent_alarm_data), ParcelConverter.marshall(alarmSetData))
@@ -138,18 +141,23 @@ class BeforeContestFragment : Fragment(), View.OnClickListener, ContestWithAlarm
 
         if (isChecked){
             Log.v("ALARM_TEST", "set alarm")
-            if (offset != 0L)
-                alarmMgr.set(AlarmManager.RTC, startTime + offset, alarmIntent)
-            else
-                alarmMgr.setExact(AlarmManager.RTC, startTime, alarmIntent)
+            if (alarmData != AlarmData.ZERO){
+                alarmMgr.set(AlarmManager.RTC, startTime * 1000 - AlarmData.getOffsetInMilli(alarmData), alarmIntent)
+                //alarmMgr.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + AlarmData.getOffsetInMinutes(alarmData) * 100, alarmIntent)
+            }
+            else{
+                alarmMgr.setExact(AlarmManager.RTC, startTime * 1000, alarmIntent)
+                //alarmMgr.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), alarmIntent)
+            }
+
 
             Log.v("ALARM_SET", "    at ${System.currentTimeMillis()  + 30 * 1000}")
             Log.v("ALARM_SET", "set at ${System.currentTimeMillis() }")
-            viewModel.addAlarm(id, offset)
+            viewModel.addAlarm(id, alarmData)
         }else{
             Log.v("ALARM_TEST", "cancel alarm")
             alarmMgr.cancel(alarmIntent)
-            viewModel.delAlarm(id)
+            viewModel.delAlarm(id, alarmData)
         }
     }
 
@@ -193,7 +201,7 @@ class BeforeContestFragment : Fragment(), View.OnClickListener, ContestWithAlarm
         }
 
         val (hour, min) = button.text.split(":")
-        val fm = fragmentManager ?: throw NullPointerException("failed to get framgentManger")
+        val fm = activity?.supportFragmentManager ?: throw NullPointerException("failed to get framgentManger")
         val ft = fm.beginTransaction()
         val prev = fm.findFragmentByTag("timePicker")
         if (prev != null)

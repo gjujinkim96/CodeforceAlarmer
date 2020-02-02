@@ -11,9 +11,7 @@ import android.widget.ToggleButton
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.codeforcealarmer.R
-import com.example.codeforcealarmer.datalayer.dataholder.ContestWithAlarm
-import com.example.codeforcealarmer.datalayer.dataholder.getOffsetTime
-import com.example.codeforcealarmer.datalayer.dataholder.getUrl
+import com.example.codeforcealarmer.datalayer.dataholder.*
 import com.example.codeforcealarmer.format.FormatHelper
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.before_contest_recycler_item.*
@@ -48,7 +46,7 @@ class ContestWithAlarmRecyclerAdapter(val context: Context, var data: List<Conte
 
             val toggleButtons = listOf(before_hour_alarm, before_15_alarm, before_5_alarm, before_0_alarm)
             val texts = listOf("1 HOUR", "15 MIN", "5 MIN", "0 MIN")
-            val minutesOffsets = listOf(60, 15, 5, 0)
+            val alarmDatas = listOf(AlarmData.HOUR, AlarmData.FIFTEEN, AlarmData.FIVE, AlarmData.ZERO)
 
             val startTime: Long? = contest.startTimeSeconds
             if (startTime == null) {
@@ -58,31 +56,22 @@ class ContestWithAlarmRecyclerAdapter(val context: Context, var data: List<Conte
             }else {
                 val curTime = System.currentTimeMillis()
                 for ((index, button) in toggleButtons.withIndex()){
-                    if (curTime + minutesOffsets[index] * 60 * 1000 < startTime){
+                    val curAlarmData = alarmDatas[index]
+                    if (curTime + AlarmData.getOffsetInMilli(curAlarmData) < startTime * 1000){
                         enableAlarmButton(button)
                         button.textOff = texts[index]
+                        button.textOn = texts[index]
+                        button.text = texts[index]
 
-                        // TODO
-//                        button.isChecked =
-//                        button.setOnCheckedChangeListener{
-//
-//                        }
+
+                        val alarmDataIndex = AlarmDataConverters().alarmDataToInt(curAlarmData) ?: throw IllegalArgumentException()
+                        button.isChecked = contest.alarmsSet[alarmDataIndex]
+                        button.setOnCheckedChangeListener{ _, isChecked ->
+                            onAlarmChecked.onChecked(button, contest.id, startTime, isChecked, curAlarmData)
+                        }
                     }else{
                         disableAlarmButton(button)
                     }
-                }
-                recycler_alarm_button.isEnabled = true
-                recycler_alarm_button.setOnCheckedChangeListener(null)
-                recycler_alarm_button.isChecked = contest.offsetTime != null
-                val offset = contest.getOffsetTime()
-                if (recycler_alarm_button.isChecked){
-
-                }else{
-
-                }
-
-                recycler_alarm_button.setOnCheckedChangeListener{ _, isChecked ->
-                    onAlarmChecked.onChecked(contest.id, startTime, isChecked, contest.getOffsetTime())
                 }
             }
         }
@@ -107,7 +96,7 @@ class ContestWithAlarmRecyclerAdapter(val context: Context, var data: List<Conte
     }
 
     interface OnCheckedAlarmButton {
-        fun onChecked(id: Int, startTime: Long, isChecked: Boolean, offsetTime: Long?)
+        fun onChecked(toggleButton: ToggleButton, id: Int, startTime: Long, isChecked: Boolean, alarmData: AlarmData)
     }
 
     inner class DiffUtilCallback(val oldData: List<ContestWithAlarm>, val newData: List<ContestWithAlarm>) : DiffUtil.Callback(){
@@ -121,19 +110,19 @@ class ContestWithAlarmRecyclerAdapter(val context: Context, var data: List<Conte
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
             oldData[oldItemPosition] == newData[newItemPosition]
     }
+}
 
-    private fun disableAlarmButton(toggleButton: ToggleButton){
-        toggleButton.apply{
-            text = "X"
-            isEnabled = false
-            setOnCheckedChangeListener(null)
-        }
+fun disableAlarmButton(toggleButton: ToggleButton){
+    toggleButton.apply{
+        text = "X"
+        isEnabled = false
+        setOnCheckedChangeListener(null)
     }
+}
 
-    private fun enableAlarmButton(toggleButton: ToggleButton){
-        toggleButton.apply{
-            isEnabled = true
-            setOnCheckedChangeListener(null)
-        }
+fun enableAlarmButton(toggleButton: ToggleButton){
+    toggleButton.apply{
+        isEnabled = true
+        setOnCheckedChangeListener(null)
     }
 }

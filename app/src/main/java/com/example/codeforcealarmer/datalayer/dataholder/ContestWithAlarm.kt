@@ -20,7 +20,7 @@ data class ContestWithAlarm(
             }
 
             alarms?.forEach {
-                val idx = AlarmDataConverters.alarmDataToInt(it) ?: throw IllegalArgumentException()
+                val idx = AlarmDataConverters().alarmDataToInt(it) ?: throw IllegalArgumentException()
                 ret.alarmsSet[idx] = true
             }
 

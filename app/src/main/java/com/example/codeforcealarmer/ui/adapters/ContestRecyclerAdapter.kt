@@ -6,6 +6,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +15,7 @@ import com.example.codeforcealarmer.R
 import com.example.codeforcealarmer.datalayer.dataholder.Contest
 import com.example.codeforcealarmer.datalayer.dataholder.getUrl
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.before_contest_recycler_item.*
+import kotlinx.android.synthetic.main.after_contest_recycler_item.*
 
 open class ContestRecyclerAdapter(private val context: Context, protected open var data: List<Contest>)
     : RecyclerView.Adapter<ContestRecyclerAdapter.ContestViewHolder>() {
@@ -25,7 +26,7 @@ open class ContestRecyclerAdapter(private val context: Context, protected open v
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContestViewHolder {
-        val newView = LayoutInflater.from(context).inflate(R.layout.before_contest_recycler_item, parent, false)
+        val newView = LayoutInflater.from(context).inflate(R.layout.after_contest_recycler_item, parent, false)
 
         return ContestViewHolder(newView)
     }
@@ -43,13 +44,13 @@ open class ContestRecyclerAdapter(private val context: Context, protected open v
 
         fun bind(contests: List<Contest>, pos: Int) {
             val contest = contests[pos]
-            contestname.text = contest.name
-            contest_phase.text = contest.phase.toString()
-            contest_duration.text =
+            after_contest_name.text = contest.name
+            after_contest_phase.text = contest.phase.toString()
+            after_contest_duration.text =
                 FormatHelper.formatSeconds(
                     contest.durationSeconds
                 )
-            contest_start_time.text =
+            after_contest_start_time.text =
                 FormatHelper.formatTime(
                     contest.startTimeSeconds
                 )

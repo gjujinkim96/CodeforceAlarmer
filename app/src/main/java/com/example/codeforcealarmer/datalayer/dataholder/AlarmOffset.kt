@@ -2,7 +2,6 @@ package com.example.codeforcealarmer.datalayer.dataholder
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 
 @Entity(
@@ -37,18 +36,17 @@ enum class AlarmData{
 }
 
 class AlarmDataConverters{
-    companion object {
-        @TypeConverter
-        fun intToAlarmData(v: Int) =
-            when (v) {
-                AlarmData.HOUR.ordinal -> AlarmData.HOUR
-                AlarmData.FIFTEEN.ordinal -> AlarmData.FIFTEEN
-                AlarmData.FIVE.ordinal -> AlarmData.FIVE
-                AlarmData.ZERO.ordinal -> AlarmData.ZERO
-                else -> null
-            }
+    @TypeConverter
+    fun intToAlarmData(v: Int): AlarmData? =
+        when (v) {
+            AlarmData.HOUR.ordinal -> AlarmData.HOUR
+            AlarmData.FIFTEEN.ordinal -> AlarmData.FIFTEEN
+            AlarmData.FIVE.ordinal -> AlarmData.FIVE
+            AlarmData.ZERO.ordinal -> AlarmData.ZERO
+            else -> null
+        }
 
-        @TypeConverter
-        fun alarmDataToInt(alarmData: AlarmData?) = alarmData?.ordinal
-    }
+    @TypeConverter
+    fun alarmDataToInt(alarmData: AlarmData?): Int? = alarmData?.ordinal
 }
+

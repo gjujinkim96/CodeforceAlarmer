@@ -2,16 +2,10 @@ package com.example.codeforcealarmer.service
 
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.app.Service
-import android.app.job.JobParameters
-import android.app.job.JobService
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
-import android.os.Message
-import android.os.SystemClock
-import android.util.Log
 import android.widget.Toast
 import androidx.core.app.JobIntentService
 import com.example.codeforcealarmer.R
@@ -20,8 +14,6 @@ import com.example.codeforcealarmer.broadcast.AlarmReceiver
 import com.example.codeforcealarmer.datalayer.dataholder.AlarmData
 import com.example.codeforcealarmer.datalayer.dataholder.ParcelConverter
 import kotlinx.coroutines.*
-import java.lang.Runnable
-import kotlin.coroutines.CoroutineContext
 
 class AlarmSetService : JobIntentService() {
     companion object{
@@ -43,14 +35,14 @@ class AlarmSetService : JobIntentService() {
             val alarmData = alarmWithStartTimeRepo.getAlarmedData()
             val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
             alarmData.forEach {
-                val startTime = it.startTime ?: return@forEach
+                val startTime = it.startTimeSeconds ?: return@forEach
 
                 val intent = Intent(this@AlarmSetService, AlarmReceiver::class.java)
                 intent.putExtra(getString(R.string.intent_alarm_data), ParcelConverter.marshall(it))
 
                 val alarmIntent = PendingIntent.getBroadcast(this@AlarmSetService, it.id, intent, PendingIntent.FLAG_CANCEL_CURRENT)
 
-                alarmManager.set(AlarmManager.RTC, startTime - AlarmData.getOffsetInMilli(it.alarmData), alarmIntent)
+                alarmManager.set(AlarmManager.RTC, startTime - AlarmData.getOffsetInMilli(it.data), alarmIntent)
             }
         }
     }

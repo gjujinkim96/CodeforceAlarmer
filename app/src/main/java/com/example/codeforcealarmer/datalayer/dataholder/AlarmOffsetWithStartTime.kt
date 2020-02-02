@@ -10,8 +10,8 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class AlarmOffsetWithStartTime(
     var id: Int,
-    var startTime: Long?,
-    var alarmData: AlarmData) : Parcelable {
+    var startTimeSeconds: Long?,
+    var data: AlarmData) : Parcelable {
 
     companion object{
         val creator by lazy {

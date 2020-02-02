@@ -1,6 +1,5 @@
 package com.example.codeforcealarmer.service
 
-import android.app.IntentService
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -11,7 +10,6 @@ import com.example.codeforcealarmer.R
 import com.example.codeforcealarmer.application.MyApplication
 import com.example.codeforcealarmer.datalayer.dataholder.AlarmOffsetWithStartTime
 import com.example.codeforcealarmer.datalayer.dataholder.ParcelConverter
-import com.example.codeforcealarmer.format.FormatHelper
 import kotlinx.coroutines.runBlocking
 
 class DataSaverService : JobIntentService() {
@@ -44,7 +42,7 @@ class DataSaverService : JobIntentService() {
         val channelId = getString(R.string.alarm_notifyer_channel_id)
         var builder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("$contestTitle is starting in ${alarmData.alarmData.name}")
+            .setContentTitle("$contestTitle is starting in ${alarmData.data.name}")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         val notificationId = alarmData.id
@@ -54,7 +52,7 @@ class DataSaverService : JobIntentService() {
 
         runBlocking {
             Log.v("ALARM_INPUT", "delete from service")
-            alarmOffsetRepo.delete(alarmData.id, alarmData.alarmData)
+            alarmOffsetRepo.delete(alarmData.id, alarmData.data)
         }
     }
 }
