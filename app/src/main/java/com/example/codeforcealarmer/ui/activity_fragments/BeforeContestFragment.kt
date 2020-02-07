@@ -22,6 +22,7 @@ import com.example.codeforcealarmer.application.MyApplication
 import com.example.codeforcealarmer.R
 import com.example.codeforcealarmer.broadcast.AlarmReceiver
 import com.example.codeforcealarmer.datalayer.dataholder.AlarmData
+import com.example.codeforcealarmer.datalayer.dataholder.AlarmOffset
 import com.example.codeforcealarmer.datalayer.dataholder.AlarmOffsetWithStartTime
 import com.example.codeforcealarmer.datalayer.dataholder.ParcelConverter
 import com.example.codeforcealarmer.ui.adapters.ContestWithAlarmRecyclerAdapter
@@ -131,23 +132,24 @@ class BeforeContestFragment : Fragment(), View.OnClickListener, ContestWithAlarm
                 alarmData
             )
 
+        val alarmOffset = AlarmOffset(id, alarmData)
+
         Log.v("SERVICE_TEST", "alarmdata $alarmSetData")
 
         val intent = Intent(requireContext(), AlarmReceiver::class.java)
         intent.putExtra(requireContext().getString(R.string.intent_alarm_data), ParcelConverter.marshall(alarmSetData))
 
-        val alarmIntent = PendingIntent.getBroadcast(requireContext(), id, intent, PendingIntent.FLAG_CANCEL_CURRENT)
-
+        val alarmIntent = PendingIntent.getBroadcast(requireContext(), alarmOffset.hashCode(), intent, 0)
 
         if (isChecked){
             Log.v("ALARM_TEST", "set alarm")
             if (alarmData != AlarmData.ZERO){
                 alarmMgr.set(AlarmManager.RTC, startTime * 1000 - AlarmData.getOffsetInMilli(alarmData), alarmIntent)
-                //alarmMgr.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + AlarmData.getOffsetInMinutes(alarmData) * 100, alarmIntent)
+                //alarmMgr.set(AlarmManager.RTC, System.currentTimeMillis() + AlarmData.getOffsetInMinutes(alarmData) * 1000, alarmIntent)
             }
             else{
                 alarmMgr.setExact(AlarmManager.RTC, startTime * 1000, alarmIntent)
-                //alarmMgr.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), alarmIntent)
+                //alarmMgr.setExact(AlarmManager.RTC, System.currentTimeMillis(), alarmIntent)
             }
 
 

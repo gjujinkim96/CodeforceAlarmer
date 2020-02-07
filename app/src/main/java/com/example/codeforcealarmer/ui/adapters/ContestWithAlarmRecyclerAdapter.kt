@@ -36,14 +36,6 @@ class ContestWithAlarmRecyclerAdapter(val context: Context, var data: List<Conte
                     contest.startTimeSeconds
                 )
 
-            containerView?.setOnClickListener {
-                val intent = Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse(contest.getUrl())
-                }
-
-                context.startActivity(intent)
-            }
-
             val toggleButtons = listOf(before_hour_alarm, before_15_alarm, before_5_alarm, before_0_alarm)
             val texts = listOf("1 HOUR", "15 MIN", "5 MIN", "0 MIN")
             val alarmDatas = listOf(AlarmData.HOUR, AlarmData.FIFTEEN, AlarmData.FIVE, AlarmData.ZERO)

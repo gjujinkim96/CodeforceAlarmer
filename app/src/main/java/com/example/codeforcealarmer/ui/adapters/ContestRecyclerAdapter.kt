@@ -54,14 +54,6 @@ open class ContestRecyclerAdapter(private val context: Context, protected open v
                 FormatHelper.formatTime(
                     contest.startTimeSeconds
                 )
-
-            containerView?.setOnClickListener {
-                val intent = Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse(contest.getUrl())
-                }
-
-                context.startActivity(intent)
-            }
         }
     }
 

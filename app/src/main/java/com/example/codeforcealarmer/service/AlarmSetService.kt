@@ -6,29 +6,31 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.JobIntentService
 import com.example.codeforcealarmer.R
 import com.example.codeforcealarmer.application.MyApplication
 import com.example.codeforcealarmer.broadcast.AlarmReceiver
 import com.example.codeforcealarmer.datalayer.dataholder.AlarmData
+import com.example.codeforcealarmer.datalayer.dataholder.AlarmOffset
 import com.example.codeforcealarmer.datalayer.dataholder.ParcelConverter
 import kotlinx.coroutines.*
 
 class AlarmSetService : JobIntentService() {
     companion object{
-        val JOB_ID = 11
+        private const val JOB_ID = 11
         fun enqueueWork(context: Context, work: Intent){
             enqueueWork(context, AlarmSetService::class.java, JOB_ID, work)
         }
     }
 
-    val alarmWithStartTimeRepo by lazy { (application as MyApplication).appContainer.alarmOffsetWithStartTimeRepo }
+    private val alarmWithStartTimeRepo by lazy { (application as MyApplication).appContainer.alarmOffsetWithStartTimeRepo }
 
     override fun onHandleWork(intent: Intent) {
         val handler =  Handler(Looper.getMainLooper())
         handler.post{
-            Toast.makeText(this@AlarmSetService, "Call from Service", Toast.LENGTH_LONG).show()
+            Toast.makeText(this@AlarmSetService, "Call from Service22", Toast.LENGTH_LONG).show()
         }
 
         runBlocking {
@@ -40,9 +42,15 @@ class AlarmSetService : JobIntentService() {
                 val intent = Intent(this@AlarmSetService, AlarmReceiver::class.java)
                 intent.putExtra(getString(R.string.intent_alarm_data), ParcelConverter.marshall(it))
 
-                val alarmIntent = PendingIntent.getBroadcast(this@AlarmSetService, it.id, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+                val alarmIntent = PendingIntent.getBroadcast(
+                    this@AlarmSetService,
+                    AlarmOffset(it.id, it.data).hashCode(),
+                    intent,
+                    0)
 
-                alarmManager.set(AlarmManager.RTC, startTime - AlarmData.getOffsetInMilli(it.data), alarmIntent)
+                Log.v("ALARM_UPDATE",
+                    "AlarmSetService:onHandleWork:alarmdata:${it}")
+                alarmManager.set(AlarmManager.RTC, startTime * 1000 - AlarmData.getOffsetInMilli(it.data), alarmIntent)
             }
         }
     }

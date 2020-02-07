@@ -12,19 +12,20 @@ import android.widget.Toast
 import androidx.core.content.getSystemService
 import com.example.codeforcealarmer.service.AlarmSetService
 
-class BootReceiver : BroadcastReceiver(){
+class AlarmUpdateReceiver : BroadcastReceiver(){
     override fun onReceive(context: Context?, intent: Intent?) {
-        Toast.makeText(context, "Received BOOT_COMPLETED", Toast.LENGTH_LONG).show()
-        //Toast.makeText(context, "context $context  intent $intent", Toast.LENGTH_LONG).show()
+        if (intent == null){
+            Log.v("ALARM_UPDATE",
+                "AlarmUpdateReceiver:onReceive:intent action:null")
+        }else {
+            Log.v(
+                "ALARM_UPDATE",
+                "AlarmUpdateReceiver:onReceive:intent action:${intent?.action}"
+            )
+        }
 
-        if (context == null){
-            Log.v("BOOT_ALERT", "context is null")
+        if (context == null)
             return
-        }
-
-        if (intent?.action == Intent.ACTION_BOOT_COMPLETED){
-            Log.v("BOOT_ALERT", "action is boot completed")
-        }
 
         Log.v("BOOT_ALERT", "Boot received")
         val serviceIntent = Intent(context, AlarmSetService::class.java)
