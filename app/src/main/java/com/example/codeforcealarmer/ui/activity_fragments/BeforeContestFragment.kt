@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.codeforcealarmer.ContestAlarmManger
 import com.example.codeforcealarmer.application.MyApplication
 import com.example.codeforcealarmer.R
 import com.example.codeforcealarmer.broadcast.AlarmReceiver
@@ -122,9 +123,6 @@ class BeforeContestFragment : Fragment(), View.OnClickListener, ContestWithAlarm
             return
         }
 
-        val alarmMgr: AlarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager? ?:
-        throw Exception("Expected AlarmManger")
-
         val alarmSetData =
             AlarmOffsetWithStartTime(
                 id,
@@ -132,33 +130,13 @@ class BeforeContestFragment : Fragment(), View.OnClickListener, ContestWithAlarm
                 alarmData
             )
 
-        val alarmOffset = AlarmOffset(id, alarmData)
-
-        Log.v("SERVICE_TEST", "alarmdata $alarmSetData")
-
-        val intent = Intent(requireContext(), AlarmReceiver::class.java)
-        intent.putExtra(requireContext().getString(R.string.intent_alarm_data), ParcelConverter.marshall(alarmSetData))
-
-        val alarmIntent = PendingIntent.getBroadcast(requireContext(), alarmOffset.hashCode(), intent, 0)
-
         if (isChecked){
             Log.v("ALARM_TEST", "set alarm")
-            if (alarmData != AlarmData.ZERO){
-                alarmMgr.set(AlarmManager.RTC, startTime * 1000 - AlarmData.getOffsetInMilli(alarmData), alarmIntent)
-                //alarmMgr.set(AlarmManager.RTC, System.currentTimeMillis() + AlarmData.getOffsetInMinutes(alarmData) * 1000, alarmIntent)
-            }
-            else{
-                alarmMgr.setExact(AlarmManager.RTC, startTime * 1000, alarmIntent)
-                //alarmMgr.setExact(AlarmManager.RTC, System.currentTimeMillis(), alarmIntent)
-            }
-
-
-            Log.v("ALARM_SET", "    at ${System.currentTimeMillis()  + 30 * 1000}")
-            Log.v("ALARM_SET", "set at ${System.currentTimeMillis() }")
+            ContestAlarmManger.setContestAlarm(requireContext(), alarmSetData)
             viewModel.addAlarm(id, alarmData)
         }else{
             Log.v("ALARM_TEST", "cancel alarm")
-            alarmMgr.cancel(alarmIntent)
+            ContestAlarmManger.cancelContestAlarm(requireContext(), alarmSetData)
             viewModel.delAlarm(id, alarmData)
         }
     }

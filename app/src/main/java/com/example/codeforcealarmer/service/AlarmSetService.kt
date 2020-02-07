@@ -9,6 +9,7 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.JobIntentService
+import com.example.codeforcealarmer.ContestAlarmManger
 import com.example.codeforcealarmer.R
 import com.example.codeforcealarmer.application.MyApplication
 import com.example.codeforcealarmer.broadcast.AlarmReceiver
@@ -35,23 +36,7 @@ class AlarmSetService : JobIntentService() {
 
         runBlocking {
             val alarmData = alarmWithStartTimeRepo.getAlarmedData()
-            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            alarmData.forEach {
-                val startTime = it.startTimeSeconds ?: return@forEach
-
-                val intent = Intent(this@AlarmSetService, AlarmReceiver::class.java)
-                intent.putExtra(getString(R.string.intent_alarm_data), ParcelConverter.marshall(it))
-
-                val alarmIntent = PendingIntent.getBroadcast(
-                    this@AlarmSetService,
-                    AlarmOffset(it.id, it.data).hashCode(),
-                    intent,
-                    0)
-
-                Log.v("ALARM_UPDATE",
-                    "AlarmSetService:onHandleWork:alarmdata:${it}")
-                alarmManager.set(AlarmManager.RTC, startTime * 1000 - AlarmData.getOffsetInMilli(it.data), alarmIntent)
-            }
+            ContestAlarmManger.setContestAlarm(this@AlarmSetService, *alarmData.toTypedArray())
         }
     }
 }
