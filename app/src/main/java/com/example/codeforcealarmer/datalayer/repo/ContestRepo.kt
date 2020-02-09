@@ -11,7 +11,7 @@ import com.example.codeforcealarmer.network.NetworkChecker
 
 class ContestRepo(val contestDao: ContestDao, val networkChecker: NetworkChecker) {
     companion object {
-        val url = "https://codeforces.com/api/contest.list"
+        const val URL = "https://codeforces.com/api/contest.list"
     }
 
     fun getBeforeContests() = contestDao.getBetweenPhases(
@@ -34,10 +34,10 @@ class ContestRepo(val contestDao: ContestDao, val networkChecker: NetworkChecker
         return LoadContestResult.OKAY
     }
 
-    fun getName(id: Int) = contestDao.getName(id)
+    suspend fun getName(id: Int) = contestDao.getName(id)
 
     private suspend fun loadContest(): List<Contest>?{
-        val jsonString = HttpHandler.fetchFromUrl(url)
+        val jsonString = HttpHandler.fetchFromUrl(URL)
         if (jsonString == null){
             Log.e(this::class.java.simpleName, "failed to read jsonString")
             return null
