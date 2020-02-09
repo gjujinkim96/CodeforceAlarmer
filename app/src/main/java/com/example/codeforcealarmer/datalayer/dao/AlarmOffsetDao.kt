@@ -11,7 +11,7 @@ interface AlarmOffsetDao{
     suspend fun update(id: Int, newData: AlarmData)
 
     @Query("DELETE FROM AlarmOffset WHERE id=:id AND data=:data")
-    suspend fun delete(id: Int, data: AlarmData)
+    fun delete(id: Int, data: AlarmData)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(alarmOffset: AlarmOffset) : Long

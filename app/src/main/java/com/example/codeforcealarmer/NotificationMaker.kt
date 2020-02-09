@@ -9,16 +9,16 @@ import android.os.Build
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.codeforcealarmer.datalayer.dataholder.AlarmOffsetWithStartTime
-import com.example.codeforcealarmer.service.DataSaverService
 import com.example.codeforcealarmer.ui.activity_fragments.MainActivity
-import kotlinx.coroutines.runBlocking
 
 class NotificationMaker {
     companion object {
+        const val GROUP_ID = "DATA_GROUP_ID"
+        const val SUMMARY_ID = -1
+
         fun addNotification(context: Context, contestTitle: String, alarmData: AlarmOffsetWithStartTime) {
             val channelId = context.getString(R.string.alarm_notifyer_channel_id)
             val notificationId = alarmData.id
@@ -30,12 +30,12 @@ class NotificationMaker {
             // make normal notification
             val notification = NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(android.R.drawable.ic_delete)
-                .setContentTitle("Starting in ${alarmData.data.name}")
+                .setContentTitle(makeFrontTitle(alarmData))
                 .setContentText(contestTitle)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
-                .setGroup(DataSaverService.GROUP_ID)
+                .setGroup(GROUP_ID)
                 .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
                 .build()
 
@@ -54,7 +54,7 @@ class NotificationMaker {
                 var currentAdded = false
                 activeNotifications.forEach {activeNotification ->
                     // if activeNotification is summary notification
-                    if (activeNotification.id == DataSaverService.SUMMARY_ID){
+                    if (activeNotification.id == SUMMARY_ID){
                         // added lines in summary notification
                         val extraLines = activeNotification.notification.extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)
                         extraLines.forEach {
@@ -89,33 +89,33 @@ class NotificationMaker {
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true)
-                    .setGroup(DataSaverService.GROUP_ID)
+                    .setGroup(GROUP_ID)
                     .setGroupSummary(true)
                     .build()
 
 
                 with(NotificationManagerCompat.from(context)){
                     notify(notificationId, notification)
-                    notify(DataSaverService.SUMMARY_ID, summaryNotification)
+                    notify(SUMMARY_ID, summaryNotification)
                 }
             }
         }
 
-        fun makeNotificationText(context: Context, alarmData: AlarmOffsetWithStartTime, contestTitle: String): SpannableString =
-            SpannableString("Starting in ${alarmData.data.name} $contestTitle").apply {
-                setSpan(
-                    ForegroundColorSpan(context.getColor(R.color.firstPartSummaryColor)),
-                    0,
-                    "Starting in ${alarmData.data.name}".length,
-                    Spanned.SPAN_INCLUSIVE_INCLUSIVE)
-            }
+        fun makeFrontTitle(alarmData: AlarmOffsetWithStartTime): String =
+            "Starting in ${alarmData.data.name}"
+
+        fun makeNotificationText(context: Context, alarmData: AlarmOffsetWithStartTime, contestTitle: String): SpannableString{
+            val textFrontOfTitle = makeFrontTitle(alarmData)
+            return makeNotificationText(context, textFrontOfTitle, contestTitle)
+        }
+
 
         fun makeNotificationText(context: Context, textFrontOfTitle: String, contestTitle: String): SpannableString =
             SpannableString("$textFrontOfTitle $contestTitle").apply {
                 setSpan(
                     ForegroundColorSpan(context.getColor(R.color.firstPartSummaryColor)),
                     0,
-                    "Starting in $textFrontOfTitle".length,
+                    textFrontOfTitle.length,
                     Spanned.SPAN_INCLUSIVE_INCLUSIVE)
             }
 

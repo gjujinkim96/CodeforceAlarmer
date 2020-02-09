@@ -34,7 +34,7 @@ class ContestRepo(val contestDao: ContestDao, val networkChecker: NetworkChecker
         return LoadContestResult.OKAY
     }
 
-    suspend fun getName(id: Int) = contestDao.getName(id)
+    fun getName(id: Int) = contestDao.getName(id)
 
     private suspend fun loadContest(): List<Contest>?{
         val jsonString = HttpHandler.fetchFromUrl(url)

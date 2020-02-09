@@ -65,7 +65,7 @@ interface ContestDao {
     suspend fun updateCodingPhase(changePhase: Phase = Phase.CODING) : Int
 
     @Query("SELECT name From Contest WHERE id=:id")
-    suspend fun getName(id: Int) : String
+    fun getName(id: Int) : String
 
     @Query("SELECT * FROM Contest WHERE id=:id")
     suspend fun get(id: Int) : Contest

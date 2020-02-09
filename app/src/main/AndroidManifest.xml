@@ -27,10 +27,7 @@
                 <action android:name="android.intent.action.DATE_CHANGED"/>
             </intent-filter>
         </receiver>
-        
-        <service
-            android:name=".service.DataSaverService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
         <service
             android:name=".service.AlarmSetService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
