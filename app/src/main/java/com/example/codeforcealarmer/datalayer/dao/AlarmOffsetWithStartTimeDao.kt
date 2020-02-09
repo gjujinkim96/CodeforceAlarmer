@@ -7,5 +7,5 @@ import com.example.codeforcealarmer.datalayer.dataholder.AlarmOffsetWithStartTim
 @Dao
 interface AlarmOffsetWithStartTimeDao {
     @Query("SELECT Contest.id, Contest.startTimeSeconds, AlarmOffset.data  FROM Contest, AlarmOffset WHERE Contest.id = AlarmOffset.id")
-    suspend fun getAlarmedData() : List<AlarmOffsetWithStartTime>
+    fun getAlarmedData() : List<AlarmOffsetWithStartTime>
 }
