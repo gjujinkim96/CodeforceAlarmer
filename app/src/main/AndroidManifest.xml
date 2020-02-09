@@ -10,6 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".ui.activity_fragments.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,7 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <receiver android:name=".broadcast.AlarmReceiver"/>
+
         <receiver
             android:name=".broadcast.AlarmUpdateReceiver">
             <intent-filter>
@@ -27,6 +30,15 @@
                 <action android:name="android.intent.action.DATE_CHANGED"/>
             </intent-filter>
         </receiver>
+
+        <service
+            android:name="service.UpdateAlarmService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
+        <service
+            android:name="service.HandleIncomingAlarmService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET"/>
