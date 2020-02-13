@@ -10,6 +10,7 @@ import com.example.codeforcealarmer.application.MyApplication
 import com.example.codeforcealarmer.ui.adapters.MyFragmentPagerAdapter
 import com.example.codeforcealarmer.R
 import com.example.codeforcealarmer.datalayer.dataholder.LoadContestResult
+import com.example.codeforcealarmer.service.schedulePeriodicUpdate
 import com.example.codeforcealarmer.viewmodels.MainActivityViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -46,14 +47,15 @@ class MainActivity : AppCompatActivity() {
         val viewModel: MainActivityViewModel by viewModels { viewModelFactory }
 
         viewModel.isLoading.observe(this, Observer {
-          if (it == false)
-              main_swipelayout.isRefreshing = false
+            if (it == false)
+                main_swipelayout.isRefreshing = false
         })
 
         viewModel.loadingState.observe(this, Observer {
             when (it){
                 LoadContestResult.NETWORK_ERROR -> Snackbar.make(main_swipelayout, R.string.snackbar_no_internet_text, Snackbar.LENGTH_LONG).show()
                 LoadContestResult.OTHER_ERROR -> Snackbar.make(main_swipelayout, R.string.snackbar_other_error, Snackbar.LENGTH_LONG).show()
+                else -> {}
             }
         })
 
@@ -63,5 +65,7 @@ class MainActivity : AppCompatActivity() {
             viewModel.isLoading.value = true
             viewModel.load()
         }
+
+        schedulePeriodicUpdate(this)
     }
 }

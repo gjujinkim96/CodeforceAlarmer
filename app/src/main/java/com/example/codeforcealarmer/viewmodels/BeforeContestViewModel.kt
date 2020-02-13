@@ -43,8 +43,10 @@ class BeforeContestViewModel(
         newDiv1: Boolean? = null,
         newDiv2: Boolean? = null,
         newDiv3: Boolean? = null,
-        newOther: Boolean? = null) {
-        val newFilter = filterLiveData.value?.copyWithNull(newStartTime, newEndTime, newDiv1, newDiv2, newDiv3, newOther)
+        newOther: Boolean? = null,
+        newTimeEnabled: Boolean? = null) {
+        val newFilter = filterLiveData.value?.
+            copyWithNull(newStartTime, newEndTime, newDiv1, newDiv2, newDiv3, newOther, newTimeEnabled)
         if (newFilter != null && newFilter != filterLiveData.value){
             Log.v("FILTER_DEBUG", "ViewModel: changedSetting: new filter is not same as old")
             contestFilterRepo.change(newFilter)

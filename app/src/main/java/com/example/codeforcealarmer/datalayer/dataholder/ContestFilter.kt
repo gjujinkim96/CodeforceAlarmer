@@ -7,8 +7,8 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 
 data class ContestFilter(var divFilter: ContestType = ContestType.makeAllTrue(), var startTime: LocalTime = LocalTime.now(),
-                         var endTime: LocalTime = LocalTime.now()) {
-    fun copy() = ContestFilter(this.divFilter.copy(), this.startTime, this.endTime)
+                         var endTime: LocalTime = LocalTime.now(), var timeEnabled: Boolean = false) {
+    fun copy() = ContestFilter(divFilter.copy(), startTime, endTime, timeEnabled)
 
     // for newContestType it copied
     fun copyWithNull(newStartTime: LocalTime? = null,
@@ -16,7 +16,8 @@ data class ContestFilter(var divFilter: ContestType = ContestType.makeAllTrue(),
              newDiv1: Boolean? = null,
              newDiv2: Boolean? = null,
              newDiv3: Boolean? = null,
-             newOther: Boolean? = null) : ContestFilter {
+             newOther: Boolean? = null,
+             newTimeEnabled: Boolean? = null) : ContestFilter {
         val copied = this.copy()
         if (newStartTime != null)
             copied.startTime = newStartTime
@@ -30,6 +31,8 @@ data class ContestFilter(var divFilter: ContestType = ContestType.makeAllTrue(),
             copied.divFilter.div3 = newDiv3
         if (newOther != null)
             copied.divFilter.other = newOther
+        if (newTimeEnabled != null)
+            copied.timeEnabled = newTimeEnabled
         Log.v("FILTER_DEBUG", "contestfilter: copy: \ncurrent: $this \n copied: $copied")
         return copied
     }
@@ -38,19 +41,17 @@ data class ContestFilter(var divFilter: ContestType = ContestType.makeAllTrue(),
         if (!divFilter.contains(contest.contestType))
             return false
 
-        val contestStartTime = contest.startTimeSeconds
-        if (contestStartTime != null) {
-            val instant = Instant.ofEpochSecond(contestStartTime)
-            val zoneId = ZoneId.systemDefault()
-            val zonedDateTime = ZonedDateTime.ofInstant(instant, zoneId)
-            val localTime = zonedDateTime.toLocalTime()
-            if (startTime <= endTime && startTime <= localTime && localTime <= endTime)
-                return true
-            else if (startTime <= localTime || localTime <= endTime)
-                return true
+        if (!timeEnabled)
+            return true
 
-            return false
-        }else
-            return false
+        val contestStartTime = contest.startTimeSeconds ?: return false
+        val instant = Instant.ofEpochSecond(contestStartTime)
+        val zoneId = ZoneId.systemDefault()
+        val zonedDateTime = ZonedDateTime.ofInstant(instant, zoneId)
+        val localTime = zonedDateTime.toLocalTime()
+        return if (startTime < endTime)
+            startTime <= localTime && localTime <= endTime
+        else
+            startTime <= localTime || localTime <= endTime
     }
 }

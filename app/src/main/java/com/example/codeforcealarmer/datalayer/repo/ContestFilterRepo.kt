@@ -30,6 +30,8 @@ class ContestFilterRepo(val context: Context) {
 
         val divFilter = contestFilter.divFilter
 
+        val timeEnabled = contestFilter.timeEnabled
+
         sharedPreferences.edit().apply{
             putInt(context.getString(R.string.saved_start_hour), startHour)
             putInt(context.getString(R.string.saved_start_min), startMin)
@@ -39,18 +41,20 @@ class ContestFilterRepo(val context: Context) {
             putBoolean(context.getString(R.string.saved_is_div2), divFilter.div2)
             putBoolean(context.getString(R.string.saved_is_div3), divFilter.div3)
             putBoolean(context.getString(R.string.saved_is_other), divFilter.other)
+            putBoolean(context.getString(R.string.saved_time_enabled), timeEnabled)
             apply()
         }
     }
 
     fun load(){
         val sharedPreferences = context.getSharedPreferences(context.getString(R.string.shared_preference_key), Context.MODE_PRIVATE)
-        val startHour = sharedPreferences.getInt(context.getString(R.string.saved_start_hour), 0)
+        val startHour = sharedPreferences.getInt(context.getString(R.string.saved_start_hour), 10)
         val startMin = sharedPreferences.getInt(context.getString(R.string.saved_start_min), 0)
-        val endHour = sharedPreferences.getInt(context.getString(R.string.saved_end_hour), 23)
-        val endMin = sharedPreferences.getInt(context.getString(R.string.saved_end_min), 59)
+        val endHour = sharedPreferences.getInt(context.getString(R.string.saved_end_hour), 22)
+        val endMin = sharedPreferences.getInt(context.getString(R.string.saved_end_min), 0)
         val startLocalTime = LocalTime.of(startHour, startMin)
         val endLocalTime = LocalTime.of(endHour, endMin)
+        val timeEnabled = sharedPreferences.getBoolean(context.getString(R.string.saved_time_enabled), false)
 
 
         val isDiv1Checked = sharedPreferences.getBoolean(context.getString(R.string.saved_is_div1), true)
@@ -70,7 +74,8 @@ class ContestFilterRepo(val context: Context) {
             ContestFilter(
                 newContestType,
                 startLocalTime,
-                endLocalTime
+                endLocalTime,
+                timeEnabled
             )
     }
 }

@@ -1,10 +1,11 @@
-package service
+package com.example.codeforcealarmer.service
 
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.JobIntentService
 import com.example.codeforcealarmer.ContestAlarmManger
 import com.example.codeforcealarmer.application.MyApplication
+import kotlinx.coroutines.runBlocking
 
 class UpdateAlarmService : JobIntentService() {
     private val alarmWithStartTimeRepo by lazy {
@@ -20,7 +21,7 @@ class UpdateAlarmService : JobIntentService() {
     }
 
     override fun onHandleWork(intent: Intent) {
-        val alarmData = alarmWithStartTimeRepo.getAlarmedData()
-        ContestAlarmManger.setContestAlarm(this, *alarmData.toTypedArray())
+        val alarmData = runBlocking { alarmWithStartTimeRepo.getAlarmedData() }
+        ContestAlarmManger.setContestAlarm(this@UpdateAlarmService, *alarmData.toTypedArray())
     }
 }

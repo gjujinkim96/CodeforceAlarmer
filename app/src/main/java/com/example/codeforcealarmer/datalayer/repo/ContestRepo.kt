@@ -1,15 +1,17 @@
 package com.example.codeforcealarmer.datalayer.repo
 
+import android.content.Context
 import android.util.Log
 import com.example.codeforcealarmer.datalayer.dao.ContestDao
 import com.example.codeforcealarmer.datalayer.dataholder.Contest
 import com.example.codeforcealarmer.datalayer.dataholder.LoadContestResult
 import com.example.codeforcealarmer.datalayer.dataholder.Phase
+import com.example.codeforcealarmer.network.DownloadEstimator
 import com.example.codeforcealarmer.network.HttpHandler
 import com.example.codeforcealarmer.network.JsonContestParser
 import com.example.codeforcealarmer.network.NetworkChecker
 
-class ContestRepo(val contestDao: ContestDao, val networkChecker: NetworkChecker) {
+class ContestRepo(val context: Context, val contestDao: ContestDao) {
     companion object {
         const val URL = "https://codeforces.com/api/contest.list"
     }
@@ -27,8 +29,9 @@ class ContestRepo(val contestDao: ContestDao, val networkChecker: NetworkChecker
     // load inner function where current return return null or data
     // and outer function if ret was null check internet and return appropriate loadcontestrsult
     suspend fun load() : LoadContestResult {
+        Log.v("UPDATE_PERIODICALLY", "load")
         val contests = loadContest() ?:
-            return if (networkChecker.isThereInternet()) LoadContestResult.OTHER_ERROR else LoadContestResult.NETWORK_ERROR
+            return if (NetworkChecker.isThereInternet(context)) LoadContestResult.OTHER_ERROR else LoadContestResult.NETWORK_ERROR
 
         contestDao.upsert(contests)
         return LoadContestResult.OKAY
@@ -38,14 +41,19 @@ class ContestRepo(val contestDao: ContestDao, val networkChecker: NetworkChecker
 
     private suspend fun loadContest(): List<Contest>?{
         val jsonString = HttpHandler.fetchFromUrl(URL)
+        jsonString?.let {
+            DownloadEstimator.setEstimate(context, jsonString.toByteArray().size.toLong())
+        }
+
         if (jsonString == null){
             Log.e(this::class.java.simpleName, "failed to read jsonString")
             return null
         }
 
-        val jsonResult =  JsonContestParser(
-            jsonString
-        ).apply { parse() }
+        val jsonResult =  JsonContestParser(jsonString).apply {
+            parse()
+        }
+
         if (jsonResult.status != JsonContestParser.Status.OK) {
             Log.e(this::class.java.simpleName, "there was error parsing JSON")
             return null

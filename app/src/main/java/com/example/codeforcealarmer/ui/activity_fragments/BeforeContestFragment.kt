@@ -31,6 +31,7 @@ import com.example.codeforcealarmer.ui.adapters.disableAlarmButton
 import com.example.codeforcealarmer.viewmodels.BeforeContestViewModel
 import com.example.codeforcealarmer.viewmodels.BeforeViewModelFactory
 import kotlinx.android.synthetic.main.before_contest_fragment.*
+import kotlinx.android.synthetic.main.before_contest_recycler_item.*
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
 
@@ -84,6 +85,10 @@ class BeforeContestFragment : Fragment(), View.OnClickListener, ContestWithAlarm
             main_div2.isChecked = it.divFilter.div2
             main_div3.isChecked = it.divFilter.div3
             main_other.isChecked = it.divFilter.other
+            before_time_filter_toggle.isChecked = it.timeEnabled
+            before_time_button.isEnabled = it.timeEnabled
+            after_time_button.isEnabled = it.timeEnabled
+            before_between_time_filter.isEnabled = it.timeEnabled
 
             // change click id to constant
             updateTimeView(1, it.startTime.hour, it.startTime.minute)
@@ -114,6 +119,14 @@ class BeforeContestFragment : Fragment(), View.OnClickListener, ContestWithAlarm
 
         before_time_button.setOnClickListener(this)
         after_time_button.setOnClickListener(this)
+
+        before_time_filter_toggle.setOnCheckedChangeListener{
+            _, isChecked ->
+            viewModel.changeSetting(newTimeEnabled = isChecked)
+            before_time_button.isEnabled = isChecked
+            after_time_button.isEnabled = isChecked
+            before_between_time_filter.isEnabled = isChecked
+        }
     }
 
     override fun onChecked(toggleButton: ToggleButton, id: Int, startTime: Long, isChecked: Boolean, alarmData: AlarmData){

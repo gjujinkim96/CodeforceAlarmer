@@ -23,4 +23,5 @@
     <string name="snackbar_no_internet_text">There is no internet connection. Currently shown may not be the latest data.</string>
     <string name="snackbar_other_error">Something went wrong when loading data.</string>
     <string name="after_empty_text">There is no contest data.</string>
+    <string name="saved_time_enabled" translatable="false">com.codeforcealarmer.SP_TIME_ENABLED</string>
 </resources>

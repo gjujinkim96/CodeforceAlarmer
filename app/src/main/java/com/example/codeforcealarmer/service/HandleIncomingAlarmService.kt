@@ -1,8 +1,7 @@
-package service
+package com.example.codeforcealarmer.service
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.core.app.JobIntentService
 import com.example.codeforcealarmer.NotificationMaker
 import com.example.codeforcealarmer.R

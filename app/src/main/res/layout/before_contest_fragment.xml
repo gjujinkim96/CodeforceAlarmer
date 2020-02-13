@@ -6,6 +6,38 @@
     android:layout_height="match_parent"
     tools:context=".ui.activity_fragments.MainActivity">
 
+    <TextView
+        android:id="@+id/before_between_time_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="~"
+        android:textColor="@android:color/primary_text_light"
+        app:layout_constraintBaseline_toBaselineOf="@+id/before_time_button"
+        app:layout_constraintEnd_toStartOf="@+id/after_time_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/before_time_button" />
+
+    <TextView
+        android:id="@+id/before_time_filter_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time Filter"
+        android:textColor="#000000"
+        app:layout_constraintBaseline_toBaselineOf="@+id/before_time_button"
+        app:layout_constraintEnd_toStartOf="@+id/before_time_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ToggleButton
+        android:id="@+id/before_time_filter_toggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOff="OFF"
+        app:layout_constraintBaseline_toBaselineOf="@+id/after_time_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/after_time_button" />
+
     <com.example.codeforcealarmer.ui.recyclerview.RecyclerViewWithLoadingAndEmptyView
         android:id="@+id/before_contest_recycler_view"
         android:layout_width="0dp"
@@ -15,7 +47,9 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/before_divider"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.0">
+
+    </com.example.codeforcealarmer.ui.recyclerview.RecyclerViewWithLoadingAndEmptyView>
 
     <CheckBox
         android:id="@+id/main_div1"
@@ -68,23 +102,23 @@
 
     <Button
         android:id="@+id/before_time_button"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        app:layout_constraintEnd_toStartOf="@+id/after_time_button"
+        app:layout_constraintEnd_toStartOf="@+id/before_between_time_filter"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/before_time_filter_text"
         app:layout_constraintTop_toBottomOf="@+id/main_div1"
         tools:text="14:00" />
 
     <Button
         android:id="@+id/after_time_button"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:enabled="true"
         app:layout_constraintBaseline_toBaselineOf="@+id/before_time_button"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/before_time_filter_toggle"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/before_time_button"
+        app:layout_constraintStart_toEndOf="@+id/before_between_time_filter"
         tools:text="22:00" />
 
     <ProgressBar

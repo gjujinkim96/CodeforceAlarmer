@@ -32,12 +32,17 @@
         </receiver>
 
         <service
-            android:name="service.UpdateAlarmService"
+            android:name=".service.UpdateAlarmService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
 
         <service
-            android:name="service.HandleIncomingAlarmService"
+            android:name=".service.HandleIncomingAlarmService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
+
+        <service
+            android:name=".service.UpdateNewContestService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
 
     </application>
 
